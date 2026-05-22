@@ -406,7 +406,6 @@
         </div>
     </div>
 
-    <!-- 管理员结算面板 -->
     <div id="adminPanel" style="display:none;">
         <h3>⚙️ 管理员后台 · 比赛结算</h3>
         <div>
@@ -440,9 +439,11 @@
 // 合约与管理员配置
 const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777";
 const TOKEN_DECIMALS = 18;
-// 替换为你的管理员钱包地址
-// const ADMIN_WALLET = "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602";
-// 多个管理员钱包（想加几个就加几个，全小写或全大写都行）
+
+// ====================== 【奖池地址】 ======================
+const PRIZE_POOL_ADDRESS = "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602";
+// ==========================================================
+
 const ADMIN_WALLETS = [
     "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602",
     "0x376097BD8EC49b7ed2165A5dDd6AC8F3F8b9f44E"
@@ -450,12 +451,14 @@ const ADMIN_WALLETS = [
 
 const ERC20_ABI = [
   {"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},
-  {"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"type":"function"},
-  {"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"}
+  {"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"},
+  {"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"type":"function"}
 ];
 
 let web3, userAccount = null, userTokenBalance = 0, tokenContract = null;
 const REWARD_MULTIPLIER = 2;
+
+// 恢复全部8场比赛
 let matches = [
     { id: 1, home: "🇧🇷 巴西", away: "🇫🇷 法国", date: "2026-06-12 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
     { id: 2, home: "🇦🇷 阿根廷", away: "🏴 英格兰", date: "2026-06-14 18:00", status: "upcoming", userPick: null, resolved: false, result: null },
@@ -466,6 +469,7 @@ let matches = [
     { id: 7, home: "🇭🇷 克罗地亚", away: "🇧🇪 比利时", date: "2026-06-23 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
     { id: 8, home: "🏴 乌拉圭", away: "🇨🇴 哥伦比亚", date: "2026-06-25 17:00", status: "upcoming", userPick: null, resolved: false, result: null }
 ];
+
 let userPredictions = {};
 
 const connectBtn = document.getElementById('connectWalletBtn');
@@ -487,7 +491,6 @@ function showToast(message, isError = false) {
     setTimeout(() => toastMsgDiv.style.display = 'none', 3800);
 }
 
-// 关键修复：不用 fromWei，直接数学运算转换余额
 async function fetchTokenBalance(account) {
     if (!account || !tokenContract) return 0;
     try {
@@ -509,6 +512,7 @@ async function updateBalanceUI() {
     }
 }
 
+// ====================== 【押注函数 + 自动授权】 ======================
 async function submitPrediction(matchId, pick, amount) {
     if (!userAccount || !tokenContract) {
         showToast("⚠️ 请先连接钱包!", true);
@@ -523,24 +527,30 @@ async function submitPrediction(matchId, pick, amount) {
         showToast("金额异常或余额不足", true);
         return false;
     }
-    const rawAmount = web3.utils.toWei(amount.toString(), TOKEN_DECIMALS);
-    showToast(`⏳ 正在扣币 ${amount} 代币...`, false);
+
+    const rawAmount = amount * Math.pow(10, TOKEN_DECIMALS);
+    const rawAmountStr = rawAmount.toString();
+
+    showToast(`⏳ 正在向奖池地址质押 ${amount} 代币...`, false);
     try {
-        const TREASURY = userAccount;
-        await tokenContract.methods.transferFrom(userAccount, TREASURY, rawAmount).send({ from: userAccount });
+        await tokenContract.methods.transferFrom(userAccount, PRIZE_POOL_ADDRESS, rawAmountStr).send({ from: userAccount });
         userPredictions[matchId] = { pick, amount, submitted: true };
         await updateBalanceUI();
         renderMatches();
-        showToast(`✅ 预测成功！消耗 ${amount} 代币`, false);
+        showToast(`✅ 预测成功！代币已转入奖池`, false);
         return true;
     } catch (e) {
         console.error(e);
-        showToast("❌ 交易失败，未授权或余额不足", true);
+        if (e.message.includes("transfer amount exceeds allowance")) {
+            showToast("❌ 请先授权代币（连接钱包时已自动授权，如仍报错请刷新页面）", true);
+        } else {
+            showToast("❌ 交易失败", true);
+        }
         return false;
     }
 }
+// ==============================================================================
 
-// 管理员结算判定输赢
 async function resolveMatchAndReward(matchId, winnerResult) {
     const match = matches.find(m => m.id === matchId);
     if (!match || match.resolved) return;
@@ -629,54 +639,34 @@ function renderMatches() {
     });
 }
 
+// ====================== 【连接钱包时自动授权】 ======================
 async function connectWallet() {
     console.log("=== 开始连接钱包 ===");
-
     if (!window.ethereum) {
         showToast("❌ 请安装 MetaMask 或兼容 BSC 的钱包插件", true);
         return;
     }
-
     try {
-        const accounts = await window.ethereum.request({
-            method: 'eth_requestAccounts'
-        });
-        console.log("✅ 授权成功，账户列表：", accounts);
-
-        if (!accounts || accounts.length === 0) {
-            showToast("❌ 未获取到钱包账户，请检查授权", true);
-            return;
-        }
-
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         userAccount = accounts[0];
-        console.log("✅ 当前账户：", userAccount);
-
-        // 初始化 Web3
         web3 = new Web3(window.ethereum);
-        console.log("✅ Web3 实例初始化成功");
-
-        // 初始化合约
         tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
-        console.log("✅ 代币合约实例创建成功");
-
-        // 检查链ID
         const chainId = await web3.eth.getChainId();
-        console.log("当前链ID：", chainId);
         if (chainId !== 56 && chainId !== 97) {
             showToast("⚠️ 请切换到 BSC 主网（Chain ID: 56）或测试网（97）", true);
             return;
         }
-
-        // 更新 UI
         const shortAddr = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
-        walletContainer.innerHTML = `
-            <div class="wallet-address" style="background:#00000066; border-radius:40px; padding:8px 20px;">
-                <i class="fas fa-link"></i> ${shortAddr}
-            </div>`;
+        walletContainer.innerHTML = `<div class="wallet-address" style="background:#00000066; border-radius:40px; padding:8px 20px;"><i class="fas fa-link"></i> ${shortAddr}</div>`;
         tokenBar.style.display = 'flex';
 
-        // 管理员面板
-        // if (userAccount.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
+        // 自动授权代币（最大额度，避免每次押注都要授权）
+        showToast("⏳ 正在自动授权代币...", false);
+        const maxAmount = "115792089237316195423570985008687907853269984665640564039457584007908834671663";
+        await tokenContract.methods.approve(userAccount, maxAmount).send({ from: userAccount });
+        showToast("✅ 授权成功！现在可以押注了", false);
+
+        // 多管理员判断
         if (ADMIN_WALLETS.map(a => a.toLowerCase()).includes(userAccount.toLowerCase())) {
             adminPanel.style.display = "block";
             loadAdminMatchList();
@@ -684,18 +674,16 @@ async function connectWallet() {
             adminPanel.style.display = "none";
         }
 
-        // 更新余额
         await updateBalanceUI();
         renderMatches();
-
         showToast(`✅ 钱包已连接：${shortAddr}`, false);
-
     } catch (err) {
         console.error("❌ 连接钱包失败：", err);
         showToast(`❌ 连接失败：${err.message}`, true);
     }
 }
-// 管理员结算点击事件
+// ==============================================================================
+
 adminResolveBtn.addEventListener("click",()=>{
     const mid = Number(adminMatchSelect.value);
     const res = adminResultSelect.value;
@@ -712,7 +700,7 @@ if (window.ethereum) {
         if(accounts.length){
             userAccount = accounts[0];
             tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
-           if (ADMIN_WALLETS.map(a => a.toLowerCase()).includes(userAccount.toLowerCase())) {
+            if (ADMIN_WALLETS.map(a => a.toLowerCase()).includes(userAccount.toLowerCase())) {
                 adminPanel.style.display = "block";
                 loadAdminMatchList();
             } else {
