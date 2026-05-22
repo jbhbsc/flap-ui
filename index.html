@@ -610,7 +610,7 @@
                         <label for="betAmount-${match.id}">押注金额：</label>
                         <input type="number" id="betAmount-${match.id}" class="bet-amount-input" min="1" placeholder="输入代币数量" ${isSubmitted ? 'disabled' : ''} value="${isSubmitted ? predRecord.amount : ''}">
                     </div>
-                    <button class="submit-pred" data-matchid="${match.id}" ${isSubmitted ? 'disabled' : ''}>${isSubmitted ? '✓ 已预测 · 等待开奖' : '🔥 消耗自定义代币 预测赢家 🔥'}</button>
+                    <button class="submit-pred" data-matchid="${match.id}" ${isSubmitted ? 'disabled' : ''}>${isSubmitted ? '✓ 已预测 · 等待开奖' : '🔥 消耗日本币代币 预测赢家 🔥'}</button>
                     ${isSubmitted ? `<div class="status-msg"><i class="fas fa-check-circle"></i> 已提交预测，押注 ${predRecord.amount} 枚，若猜中获得 ${predRecord.amount * REWARD_MULTIPLIER} 代币</div>` : `<div class="status-msg"><i class="fas fa-coins"></i> 押注自定义数量代币 | 猜中赢双倍金额</div>`}
                 ` : `
                     <div class="status-msg"><i class="fas fa-chart-line"></i> 结果已揭晓：${match.result === 'win' ? match.home+'胜' : (match.result === 'lose' ? match.away+'胜' : '平局')} ${predRecord.submitted && predRecord.pick === match.result ? '🏆 你猜对了! +' + predRecord.amount * REWARD_MULTIPLIER + '代币' : (predRecord.submitted ? '❌ 猜错啦' : '未参与')}</div>
