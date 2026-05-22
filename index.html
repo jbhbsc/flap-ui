@@ -381,6 +381,9 @@
         <div class="logo-area">
             <h1><i class="fas fa-futbol"></i> 2026 WORLD CUP <span style="color:#FFB347;">⚡ 日本队·应援预测</span></h1>
             <p><i class="fas fa-fire"></i> 链上荣耀 | 消耗 🇯🇵 日本队代币 预测输赢 | 赢取双倍奖励</p>
+             <p style="font-size:0.75rem; color:#ffd700; margin-top:3px;">
+     📝 合约地址：0xed0a8dd0c672ef80383df7333b13538180477777
+    </p>
         </div>
         <div style="display: flex; gap: 16px; align-items: center;">
             <div class="social-links">
@@ -441,11 +444,11 @@ const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777";
 const TOKEN_DECIMALS = 18;
 
 // ====================== 【奖池地址】 ======================
-const PRIZE_POOL_ADDRESS = "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602";
+const PRIZE_POOL_ADDRESS = "0x73390FA5D2D6B37dD9304e0851bb3e6c20Ca44F4";
 // ==========================================================
 
 const ADMIN_WALLETS = [
-    "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602",
+    "0x73390FA5D2D6B37dD9304e0851bb3e6c20Ca44F4",
     "0x376097BD8EC49b7ed2165A5dDd6AC8F3F8b9f44E"
 ];
 
@@ -458,17 +461,17 @@ const ERC20_ABI = [
 let web3, userAccount = null, userTokenBalance = 0, tokenContract = null;
 const REWARD_MULTIPLIER = 2;
 
-// 恢复全部8场比赛
+// ====================== 【更新后的7场比赛】 ======================
 let matches = [
-    { id: 1, home: "🇧🇷 巴西", away: "🇫🇷 法国", date: "2026-06-12 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 2, home: "🇦🇷 阿根廷", away: "🏴 英格兰", date: "2026-06-14 18:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 3, home: "🇩🇪 德国", away: "🇪🇸 西班牙", date: "2026-06-15 20:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 4, home: "🇵🇹 葡萄牙", away: "🇳🇱 荷兰", date: "2026-06-17 15:30", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 5, home: "🇺🇸 美国", away: "🇲🇽 墨西哥", date: "2026-06-19 12:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 6, home: "🇯🇵 日本", away: "🇰🇷 韩国", date: "2026-06-21 19:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 7, home: "🇭🇷 克罗地亚", away: "🇧🇪 比利时", date: "2026-06-23 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 8, home: "🏴 乌拉圭", away: "🇨🇴 哥伦比亚", date: "2026-06-25 17:00", status: "upcoming", userPick: null, resolved: false, result: null }
+    { id: 1, home: "🇰🇷 韩国", away: "🇨🇿 捷克", date: "2026-06-12 10:00", status: "upcoming", userPick: null, resolved: false, result: null },
+    { id: 2, home: "🇧🇷 巴西", away: "🇲🇦 摩洛哥", date: "2026-06-14 06:00", status: "upcoming", userPick: null, resolved: false, result: null },
+    { id: 3, home: "🇳🇱 荷兰", away: "🇯🇵 日本", date: "2026-06-15 04:00", status: "upcoming", userPick: null, resolved: false, result: null },
+    { id: 4, home: "🇮🇷 伊朗", away: "🇳🇿 新西兰", date: "2026-06-16 09:00", status: "upcoming", userPick: null, resolved: false, result: null },
+    { id: 5, home: "🇫🇷 法国", away: "🇸🇳 塞内加尔", date: "2026-06-17 03:00", status: "upcoming", userPick: null, resolved: false, result: null },
+    { id: 6, home: "🏴 英格兰", away: "🇭🇷 克罗地亚", date: "2026-06-18 04:00", status: "upcoming", userPick: null, resolved: false, result: null },
+    { id: 7, home: "🇦🇷 阿根廷", away: "🇩🇿 阿尔及利亚", date: "2026-06-23 09:00", status: "upcoming", userPick: null, resolved: false, result: null }
 ];
+// =====================================================================
 
 let userPredictions = {};
 
