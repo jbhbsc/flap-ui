@@ -442,6 +442,11 @@ const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777";
 const TOKEN_DECIMALS = 18;
 // 替换为你的管理员钱包地址
 const ADMIN_WALLET = "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602";
+// 多个管理员钱包（想加几个就加几个，全小写或全大写都行）
+const ADMIN_WALLETS = [
+    "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602",
+    "0xf435956420137fe9E2e3054cAf7b201abD77dbEd"
+];
 
 const ERC20_ABI = [
   {"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},
@@ -482,13 +487,13 @@ function showToast(message, isError = false) {
     setTimeout(() => toastMsgDiv.style.display = 'none', 3800);
 }
 
-// 关键修复：balanceOf返回BigNumber，先转成字符串再处理
+// 关键修复：不用 fromWei，直接数学运算转换余额
 async function fetchTokenBalance(account) {
     if (!account || !tokenContract) return 0;
     try {
         const raw = await tokenContract.methods.balanceOf(account).call();
-        const balanceString = raw.toString();
-        return Number(web3.utils.fromWei(balanceString, TOKEN_DECIMALS));
+        const rawNumber = Number(raw.toString());
+        return rawNumber / Math.pow(10, TOKEN_DECIMALS);
     } catch (e) {
         console.error("查询余额失败", e);
         return 0;
@@ -671,7 +676,8 @@ async function connectWallet() {
         tokenBar.style.display = 'flex';
 
         // 管理员面板
-        if (userAccount.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
+        // if (userAccount.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
+        if (ADMIN_WALLETS.map(a => a.toLowerCase()).includes(userAccount.toLowerCase())) {
             adminPanel.style.display = "block";
             loadAdminMatchList();
         } else {
@@ -706,7 +712,7 @@ if (window.ethereum) {
         if(accounts.length){
             userAccount = accounts[0];
             tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
-            if (userAccount.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
+           if (ADMIN_WALLETS.map(a => a.toLowerCase()).includes(userAccount.toLowerCase())) {
                 adminPanel.style.display = "block";
                 loadAdminMatchList();
             } else {
