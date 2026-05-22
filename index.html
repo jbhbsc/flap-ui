@@ -438,7 +438,7 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
 // 合约与管理员配置
-const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777"; // 已修正为42位地址
+const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777";
 const TOKEN_DECIMALS = 18;
 // 替换为你的管理员钱包地址
 const ADMIN_WALLET = "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602";
@@ -482,11 +482,13 @@ function showToast(message, isError = false) {
     setTimeout(() => toastMsgDiv.style.display = 'none', 3800);
 }
 
+// 关键修复：balanceOf返回BigNumber，先转成字符串再处理
 async function fetchTokenBalance(account) {
     if (!account || !tokenContract) return 0;
     try {
         const raw = await tokenContract.methods.balanceOf(account).call();
-        return Number(web3.utils.fromWei(raw, TOKEN_DECIMALS));
+        const balanceString = raw.toString();
+        return Number(web3.utils.fromWei(balanceString, TOKEN_DECIMALS));
     } catch (e) {
         console.error("查询余额失败", e);
         return 0;
@@ -703,7 +705,6 @@ if (window.ethereum) {
     window.ethereum.on('accountsChanged', accounts => {
         if(accounts.length){
             userAccount = accounts[0];
-            // 修复：使用全局定义的TOKEN_ADDRESS初始化合约
             tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
             if (userAccount.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
                 adminPanel.style.display = "block";
