@@ -289,6 +289,35 @@
         .pred-btn.win:hover { background: #2c8c5e; }
         .pred-btn.lose:hover { background: #bc5a3c; }
         .pred-btn.draw:hover { background: #5f7f9e; }
+
+        /* 新增：自定义押注金额输入框 */
+        .bet-amount-input-container {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bet-amount-input-container label {
+            font-size: 0.9rem;
+            color: #ffdd99;
+            font-weight: 600;
+        }
+        .bet-amount-input {
+            flex: 1;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 180, 70, 0.6);
+            border-radius: 30px;
+            padding: 8px 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .bet-amount-input:focus {
+            outline: none;
+            border-color: #ffcd7e;
+            box-shadow: 0 0 8px rgba(255, 180, 70, 0.5);
+        }
+
         .submit-pred {
             width: 100%;
             background: linear-gradient(95deg, #F5A623, #E67E00);
@@ -387,7 +416,7 @@
             </div>
         </div>
         <div class="cost-badge">
-            <i class="fas fa-ticket-alt"></i> 每笔预测消耗 <strong style="font-size:1.2rem;">10</strong> 枚日本队代币 | 猜对奖励 <strong>20枚</strong>！
+            <i class="fas fa-ticket-alt"></i> 每笔预测消耗自定义数量代币 | 猜对奖励双倍金额！
         </div>
     </div>
 
@@ -413,22 +442,21 @@
     let web3;
     let userAccount = null;
     let userTokenBalance = 0;
-    const PREDICTION_COST = 10000;       // 消耗10枚日本队代币
-    const REWARD_MULTIPLIER = 20000;      // 奖励20枚
+    const REWARD_MULTIPLIER = 2;      // 猜对奖励为押注金额的2倍
     
     // 比赛数据 (激情世界杯小组赛)
     let matches = [
         { id: 1, home: "🇧🇷 巴西", away: "🇫🇷 法国", date: "2026-06-12 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
-        { id: 2, home: "🇦🇷 阿根廷", away: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格兰", date: "2026-06-14 18:00", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 2, home: "🇦🇷 阿根廷", away: "🏴 英格兰", date: "2026-06-14 18:00", status: "upcoming", userPick: null, resolved: false, result: null },
         { id: 3, home: "🇩🇪 德国", away: "🇪🇸 西班牙", date: "2026-06-15 20:00", status: "upcoming", userPick: null, resolved: false, result: null },
         { id: 4, home: "🇵🇹 葡萄牙", away: "🇳🇱 荷兰", date: "2026-06-17 15:30", status: "upcoming", userPick: null, resolved: false, result: null },
         { id: 5, home: "🇺🇸 美国", away: "🇲🇽 墨西哥", date: "2026-06-19 12:00", status: "upcoming", userPick: null, resolved: false, result: null },
         { id: 6, home: "🇯🇵 日本", away: "🇰🇷 韩国", date: "2026-06-21 19:00", status: "upcoming", userPick: null, resolved: false, result: null },
         { id: 7, home: "🇭🇷 克罗地亚", away: "🇧🇪 比利时", date: "2026-06-23 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
-        { id: 8, home: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 乌拉圭", away: "🇨🇴 哥伦比亚", date: "2026-06-25 17:00", status: "upcoming", userPick: null, resolved: false, result: null }
+        { id: 8, home: "🏴 乌拉圭", away: "🇨🇴 哥伦比亚", date: "2026-06-25 17:00", status: "upcoming", userPick: null, resolved: false, result: null }
     ];
     
-    let userPredictions = {}; // { matchId: { pick: 'win'/'lose'/'draw', submitted: true } }
+    let userPredictions = {}; // { matchId: { pick: 'win'/'lose'/'draw', amount: number, submitted: true } }
     
     const connectBtn = document.getElementById('connectWalletBtn');
     const walletContainer = document.getElementById('walletContainer');
@@ -453,7 +481,7 @@
         let storageKey = `japan_token_balance_${account.toLowerCase()}`;
         let balance = localStorage.getItem(storageKey);
         if (balance === null) {
-            balance = 80; // 初始80枚日本队代币
+            balance = 80000; // 初始80000枚日本队代币，方便测试自定义押注
             localStorage.setItem(storageKey, balance);
         } else {
             balance = parseInt(balance, 10);
@@ -482,8 +510,8 @@
         return newBalance;
     }
     
-    // 提交预测逻辑（消耗10日本队代币）
-    async function submitPrediction(matchId, pick) {
+    // 提交预测逻辑（消耗用户自定义数量的日本队代币）
+    async function submitPrediction(matchId, pick, amount) {
         if (!userAccount) {
             showToast("⚠️ 请先连接钱包参与预测!", true);
             return false;
@@ -498,25 +526,30 @@
             showToast("⛔ 你已经预测过本场，不可修改预测", true);
             return false;
         }
-        let currentBalance = await fetchTokenBalance(userAccount);
-        if (currentBalance < PREDICTION_COST) {
-            showToast(`❌ 日本队代币余额不足！需要 ${PREDICTION_COST} 枚，点击“领取测试代币”继续预测`, true);
+        
+        // 验证押注金额
+        if (isNaN(amount) || amount <= 0) {
+            showToast("❌ 请输入有效的押注金额（大于0的数字）", true);
+            return false;
+        }
+        if (amount > userTokenBalance) {
+            showToast(`❌ 代币余额不足！你当前余额为 ${userTokenBalance} 枚，无法押注 ${amount} 枚`, true);
             return false;
         }
         
-        showToast(`⏳ 正在提交预测... 消耗 10 枚日本队代币`, false);
+        showToast(`⏳ 正在提交预测... 消耗 ${amount} 枚日本队代币`, false);
         return new Promise(async (resolve) => {
             setTimeout(async () => {
-                await modifyTokenBalance(userAccount, -PREDICTION_COST);
-                userPredictions[matchId] = { pick: pick, submitted: true };
+                await modifyTokenBalance(userAccount, -amount);
+                userPredictions[matchId] = { pick: pick, amount: amount, submitted: true };
                 renderMatches();
-                showToast(`✅ 预测成功！ 押注 ${pick === 'win' ? match.home + '胜' : (pick === 'lose' ? match.away + '胜' : '平局')} ，消耗 10 日本队代币，坐等开奖`, false);
+                showToast(`✅ 预测成功！押注 ${pick === 'win' ? match.home + '胜' : (pick === 'lose' ? match.away + '胜' : '平局')}，消耗 ${amount} 日本队代币，猜中可获得 ${amount * REWARD_MULTIPLIER} 枚代币！`, false);
                 resolve(true);
             }, 700);
         });
     }
     
-    // 结算比赛并发放奖励（奖励20日本队代币）
+    // 结算比赛并发放奖励（奖励为押注金额的2倍）
     async function resolveMatchAndReward(matchId, winnerResult) {
         const match = matches.find(m => m.id === matchId);
         if (!match || match.resolved) return;
@@ -524,7 +557,7 @@
         match.result = winnerResult;
         const userPred = userPredictions[matchId];
         if (userPred && userPred.submitted && userPred.pick === winnerResult) {
-            const rewardAmount = PREDICTION_COST * REWARD_MULTIPLIER; // 20
+            const rewardAmount = userPred.amount * REWARD_MULTIPLIER;
             await modifyTokenBalance(userAccount, rewardAmount);
             showToast(`🎉🎉 惊天大胜！预测正确！获得 ${rewardAmount} 枚日本队代币奖励！`, false);
         } else if (userPred && userPred.submitted) {
@@ -541,16 +574,16 @@
             showToast("请先连接钱包再领取测试代币", true);
             return;
         }
-        await modifyTokenBalance(userAccount, 40);
-        showToast("🎁 领取成功！获得 40 枚 🇯🇵 日本队代币，尽情预测世界杯！", false);
+        await modifyTokenBalance(userAccount, 40000);
+        showToast("🎁 领取成功！获得 40000 枚 🇯🇵 日本队代币，尽情预测世界杯！", false);
     }
     
-    // 渲染所有比赛卡片
+    // 渲染所有比赛卡片（添加押注金额输入框）
     function renderMatches() {
         if (!matchesGrid) return;
         matchesGrid.innerHTML = '';
         for (let match of matches) {
-            const predRecord = userPredictions[match.id] || { pick: null, submitted: false };
+            const predRecord = userPredictions[match.id] || { pick: null, amount: 0, submitted: false };
             const isSubmitted = predRecord.submitted;
             const selectedPick = predRecord.pick;
             const isResolved = match.resolved;
@@ -572,10 +605,15 @@
                     <button class="pred-btn lose ${selectedPick === 'lose' && !isSubmitted ? 'active' : ''} ${isSubmitted ? 'disabled-btn' : ''}" data-pick="lose" ${isSubmitted || isResolved ? 'disabled' : ''}><i class="fas fa-futbol"></i> ${match.away} 胜</button>
                 </div>
                 ${!isResolved ? `
-                    <button class="submit-pred" data-matchid="${match.id}" ${isSubmitted ? 'disabled' : ''}>${isSubmitted ? '✓ 已预测 · 等待开奖' : '🔥 消耗10枚日本队代币 预测赢家 🔥'}</button>
-                    ${isSubmitted ? '<div class="status-msg"><i class="fas fa-check-circle"></i> 已提交预测，若猜中获得20日本队代币</div>' : '<div class="status-msg"><i class="fas fa-coins"></i> 预测消耗10 日本队代币 | 猜中赢双倍</div>'}
+                    <!-- 新增：押注金额输入框 -->
+                    <div class="bet-amount-input-container">
+                        <label for="betAmount-${match.id}">押注金额：</label>
+                        <input type="number" id="betAmount-${match.id}" class="bet-amount-input" min="1" placeholder="输入代币数量" ${isSubmitted ? 'disabled' : ''} value="${isSubmitted ? predRecord.amount : ''}">
+                    </div>
+                    <button class="submit-pred" data-matchid="${match.id}" ${isSubmitted ? 'disabled' : ''}>${isSubmitted ? '✓ 已预测 · 等待开奖' : '🔥 消耗自定义代币 预测赢家 🔥'}</button>
+                    ${isSubmitted ? `<div class="status-msg"><i class="fas fa-check-circle"></i> 已提交预测，押注 ${predRecord.amount} 枚，若猜中获得 ${predRecord.amount * REWARD_MULTIPLIER} 代币</div>` : `<div class="status-msg"><i class="fas fa-coins"></i> 押注自定义数量代币 | 猜中赢双倍金额</div>`}
                 ` : `
-                    <div class="status-msg"><i class="fas fa-chart-line"></i> 结果已揭晓：${match.result === 'win' ? match.home+'胜' : (match.result === 'lose' ? match.away+'胜' : '平局')} ${predRecord.submitted && predRecord.pick === match.result ? '🏆 你猜对了! +20代币' : (predRecord.submitted ? '❌ 猜错啦' : '未参与')}</div>
+                    <div class="status-msg"><i class="fas fa-chart-line"></i> 结果已揭晓：${match.result === 'win' ? match.home+'胜' : (match.result === 'lose' ? match.away+'胜' : '平局')} ${predRecord.submitted && predRecord.pick === match.result ? '🏆 你猜对了! +' + predRecord.amount * REWARD_MULTIPLIER + '代币' : (predRecord.submitted ? '❌ 猜错啦' : '未参与')}</div>
                 `}
             `;
             matchesGrid.appendChild(card);
@@ -595,8 +633,14 @@
                     showToast("请先选择胜负/平局", true);
                     return;
                 }
+                const amountInput = parentCard.querySelector(`#betAmount-${matchId}`);
+                const amount = parseInt(amountInput.value, 10);
+                if (isNaN(amount) || amount <= 0) {
+                    showToast("请输入有效的押注金额（大于0的数字）", true);
+                    return;
+                }
                 let pick = activePickBtn.getAttribute('data-pick');
-                await submitPrediction(matchId, pick);
+                await submitPrediction(matchId, pick, amount);
             });
         });
         // 选项高亮切换
@@ -617,8 +661,9 @@
             const extraDiv = document.createElement('div');
             extraDiv.style.display = 'flex';
             extraDiv.style.gap = '12px';
-            extraDiv.innerHTML = `<button id="faucetBtn" class="wallet-btn" style="background:#2a3b2c; padding:8px 16px;"><i class="fas fa-tint"></i> 领取测试代币 (+40)</button>
-                                   <button id="simulateResultBtn" class="wallet-btn" style="background:#2a2e3f; padding:8px 16px;"><i class="fas fa-dice-d6"></i> 模拟随机赛果结算</button>`;
+            extraDiv.innerHTML = `
+                <button id="simulateResultBtn" class="wallet-btn" style="background:#2a2e3f; padding:8px 16px;"><i class="fas fa-dice-d6"></i> 模拟随机赛果结算</button>
+            `;
             tokenBarDiv.appendChild(extraDiv);
             document.getElementById('faucetBtn').addEventListener('click', faucetTokens);
             document.getElementById('simulateResultBtn').addEventListener('click', async () => {
