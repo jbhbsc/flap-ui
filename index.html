@@ -438,7 +438,7 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
 // 合约与管理员配置
-// const TOKEN_ADDRESS_RAW = "0xed0a8dd0c672ef80383df7333b1353818047777";
+const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777"; // 已修正为42位地址
 const TOKEN_DECIMALS = 18;
 // 替换为你的管理员钱包地址
 const ADMIN_WALLET = "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602";
@@ -648,10 +648,6 @@ async function connectWallet() {
         web3 = new Web3(window.ethereum);
         console.log("✅ Web3 实例初始化成功");
 
-        // 直接替换成正确的、完整的合约地址（校验和格式）
-        const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777";
-        console.log("✅ 使用的合约地址：", TOKEN_ADDRESS);
-
         // 初始化合约
         tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
         console.log("✅ 代币合约实例创建成功");
@@ -707,6 +703,7 @@ if (window.ethereum) {
     window.ethereum.on('accountsChanged', accounts => {
         if(accounts.length){
             userAccount = accounts[0];
+            // 修复：使用全局定义的TOKEN_ADDRESS初始化合约
             tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
             if (userAccount.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
                 adminPanel.style.display = "block";
