@@ -438,7 +438,7 @@
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
 // 合约与管理员配置
-const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b1353818047777";
+// const TOKEN_ADDRESS_RAW = "0xed0a8dd0c672ef80383df7333b1353818047777";
 const TOKEN_DECIMALS = 18;
 // 替换为你的管理员钱包地址
 const ADMIN_WALLET = "0x5267735E31b1Ac1F2A1C943F51966ECEE817e602";
@@ -623,34 +623,74 @@ function renderMatches() {
 }
 
 async function connectWallet() {
-    if (!window.ethereum) return showToast("请安装MetaMask并切换BSC", true);
+    console.log("=== 开始连接钱包 ===");
+
+    if (!window.ethereum) {
+        showToast("❌ 请安装 MetaMask 或兼容 BSC 的钱包插件", true);
+        return;
+    }
+
     try {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3.eth.getAccounts();
-        if (!accounts.length) return;
+        const accounts = await window.ethereum.request({
+            method: 'eth_requestAccounts'
+        });
+        console.log("✅ 授权成功，账户列表：", accounts);
+
+        if (!accounts || accounts.length === 0) {
+            showToast("❌ 未获取到钱包账户，请检查授权", true);
+            return;
+        }
+
         userAccount = accounts[0];
+        console.log("✅ 当前账户：", userAccount);
+
+        // 初始化 Web3
+        web3 = new Web3(window.ethereum);
+        console.log("✅ Web3 实例初始化成功");
+
+        // 直接替换成正确的、完整的合约地址（校验和格式）
+        const TOKEN_ADDRESS = "0xed0a8dd0c672ef80383df7333b13538180477777";
+        console.log("✅ 使用的合约地址：", TOKEN_ADDRESS);
+
+        // 初始化合约
         tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
+        console.log("✅ 代币合约实例创建成功");
+
+        // 检查链ID
         const chainId = await web3.eth.getChainId();
-        if (chainId !== 56 && chainId !== 97) showToast("请切换BSC主网", true);
-        const shortAddr = `${userAccount.slice(0,6)}...${userAccount.slice(-4)}`;
-        walletContainer.innerHTML = `<div class="wallet-address" style="background:#00000066; border-radius:40px; padding:8px 20px;"><i class="fas fa-link"></i> ${shortAddr}</div>`;
+        console.log("当前链ID：", chainId);
+        if (chainId !== 56 && chainId !== 97) {
+            showToast("⚠️ 请切换到 BSC 主网（Chain ID: 56）或测试网（97）", true);
+            return;
+        }
+
+        // 更新 UI
+        const shortAddr = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+        walletContainer.innerHTML = `
+            <div class="wallet-address" style="background:#00000066; border-radius:40px; padding:8px 20px;">
+                <i class="fas fa-link"></i> ${shortAddr}
+            </div>`;
         tokenBar.style.display = 'flex';
-        // 校验管理员身份
+
+        // 管理员面板
         if (userAccount.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
             adminPanel.style.display = "block";
             loadAdminMatchList();
         } else {
             adminPanel.style.display = "none";
         }
+
+        // 更新余额
         await updateBalanceUI();
         renderMatches();
-        showToast(`钱包已连接: ${shortAddr}`, false);
+
+        showToast(`✅ 钱包已连接：${shortAddr}`, false);
+
     } catch (err) {
-        showToast("连接钱包失败", true);
+        console.error("❌ 连接钱包失败：", err);
+        showToast(`❌ 连接失败：${err.message}`, true);
     }
 }
-
 // 管理员结算点击事件
 adminResolveBtn.addEventListener("click",()=>{
     const mid = Number(adminMatchSelect.value);
