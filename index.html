@@ -2,143 +2,680 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>杠杆保证金交易</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2026世界杯预测DApp | 日本队·链上应援</title>
+    <!-- Google Fonts & 炫酷字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:Microsoft Yahei}
-        body{background:#f5f7fa;color:#333;padding:20px;max-width:700px;margin:0 auto}
-        .card{background:#fff;border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:0 2px 12px #e5e7eb}
-        h3{margin-bottom:16px;color:#222}
-        .btn{border:none;border-radius:8px;padding:12px 0;font-size:15px;cursor:pointer;font-weight:500}
-        .btn-primary{background:#409eff;color:#fff}
-        .btn-danger{background:#f56c6c;color:#fff}
-        .btn-group{display:flex;gap:10px;margin:15px 0}
-        .btn-group button{flex:1;padding:10px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer}
-        .btn-group button.active{border-color:#409eff;background:#ecf5ff;color:#409eff}
-        input{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:8px;margin:10px 0;font-size:14px}
-        .pos-item{padding:15px;border:1px solid #eee;border-radius:8px;margin:10px 0}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #f0f3fa;
+            min-height: 100vh;
+            padding: 1.5rem;
+            position: relative;
+            background: #03050b;
+        }
+
+        /* 激情世界杯宣传背景：多层合成 + 动态光束 + 足球场纹理 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(125deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 100%),
+                url('https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=2070&auto=format');
+            background-size: cover;
+            background-position: center 30%;
+            background-repeat: no-repeat;
+            z-index: -2;
+            filter: brightness(0.85) contrast(1.1);
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 40%, rgba(255, 80, 40, 0.15) 0%, rgba(0,0,0,0) 60%),
+                              repeating-linear-gradient(45deg, rgba(255,215,0,0.02) 0px, rgba(255,215,0,0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .stadium-glow {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(to top, #ffb34730, transparent);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 头部导航 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 2.5rem;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 0.8rem 2rem;
+            border: 1px solid rgba(255, 180, 60, 0.6);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+        }
+
+        .logo-area h1 {
+            font-family: 'Orbitron', monospace;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE55C, #FF8C2E);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.9rem;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px #ff6a00;
+        }
+        .logo-area p {
+            font-size: 0.8rem;
+            color: #ffe6b3;
+            letter-spacing: 1px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .social-links a {
+            color: #ffde9c;
+            font-size: 1.6rem;
+            transition: all 0.2s;
+            background: rgba(0,0,0,0.5);
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
+        }
+        .social-links a:hover {
+            color: #FFB347;
+            transform: scale(1.08);
+            background: rgba(0,0,0,0.7);
+        }
+
+        .wallet-btn {
+            background: linear-gradient(95deg, #1e2a3a, #0a111c);
+            border: 1px solid #f5a623;
+            padding: 12px 28px;
+            border-radius: 48px;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: #ffde9c;
+            font-family: 'Inter', sans-serif;
+        }
+        .wallet-btn i {
+            font-size: 1.3rem;
+        }
+        .wallet-btn:hover {
+            background: #f5a62330;
+            border-color: #ffcf70;
+            color: #fff3cf;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(245,166,35,0.5);
+        }
+
+        /* 代币卡片 */
+        .token-bar {
+            background: linear-gradient(115deg, rgba(0,0,0,0.7), rgba(20,30,45,0.85));
+            backdrop-filter: blur(10px);
+            border-radius: 36px;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-left: 8px solid #FFB347;
+            border-right: 1px solid #ffb34760;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            font-weight: 600;
+        }
+        .token-icon {
+            background: #f5b04230;
+            border-radius: 60px;
+            padding: 12px;
+            font-size: 2rem;
+        }
+        .token-balance {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #FFD966, #FFA559);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .cost-badge {
+            background: #ff8c2e30;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 1px solid #ffb347;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 2rem 0 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 6px solid #F5A623;
+            padding-left: 24px;
+            text-shadow: 0 2px 4px black;
+            background: linear-gradient(90deg, rgba(0,0,0,0.4), transparent);
+        }
+        .matches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px;
+            margin-top: 20px;
+        }
+        .match-card {
+            background: rgba(8, 16, 26, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 1.4rem 1.2rem 1.6rem;
+            transition: all 0.25s;
+            border: 1px solid rgba(255, 180, 70, 0.4);
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.5);
+        }
+        .match-card:hover {
+            transform: translateY(-8px);
+            border-color: #ffcd7e;
+            background: rgba(20, 35, 50, 0.85);
+        }
+        .match-date {
+            font-size: 0.8rem;
+            color: #ffdd99;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.35rem;
+            margin: 15px 0;
+        }
+        .team {
+            text-align: center;
+            flex: 1;
+            font-weight: 700;
+        }
+        .vs {
+            font-size: 1rem;
+            background: #F5A62330;
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #ffd966;
+        }
+        .prediction-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0 12px;
+        }
+        .pred-btn {
+            flex: 1;
+            background: #15232e;
+            border: none;
+            padding: 10px 0;
+            border-radius: 60px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .pred-btn.active {
+            background: #F5A623;
+            color: #0a0f1e;
+            box-shadow: 0 0 12px #ffb347;
+        }
+        .pred-btn.win:hover { background: #2c8c5e; }
+        .pred-btn.lose:hover { background: #bc5a3c; }
+        .pred-btn.draw:hover { background: #5f7f9e; }
+        .submit-pred {
+            width: 100%;
+            background: linear-gradient(95deg, #F5A623, #E67E00);
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            margin-top: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            color: #111;
+            font-weight: 800;
+        }
+        .submit-pred:disabled {
+            background: #555;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .status-msg {
+            font-size: 0.7rem;
+            margin-top: 10px;
+            text-align: center;
+            color: #ffd7a0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem;
+            color: #ffdd99;
+            background: rgba(0,0,0,0.4);
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+        footer a {
+            color: #ffcd7e;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        @media (max-width: 700px) {
+            .header { flex-direction: column; align-items: stretch; border-radius: 32px; }
+            .token-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .teams { font-size: 1rem; }
+            .social-links { justify-content: center; margin-top: 8px; }
+        }
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1f2b38e6;
+            backdrop-filter: blur(12px);
+            padding: 12px 28px;
+            border-radius: 50px;
+            border-left: 5px solid #F5A623;
+            font-size: 0.9rem;
+            z-index: 999;
+            pointer-events: none;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
-    <h2 style="margin-bottom:20px;text-align:center">保证金杠杆交易</h2>
-
-    <div class="card">
-        <button id="connectBtn" class="btn btn-primary">连接钱包</button>
-    </div>
-
-    <div class="card">
-        <h3>开仓交易</h3>
-        <div class="btn-group">
-            <button id="longBtn" class="active">开多</button>
-            <button id="shortBtn">开空</button>
+<div class="stadium-glow"></div>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <h1><i class="fas fa-futbol"></i> 2026 WORLD CUP <span style="color:#FFB347;">⚡ 日本队·应援预测</span></h1>
+            <p><i class="fas fa-fire"></i> 链上荣耀 | 消耗 🇯🇵 日本队代币 预测输赢 | 赢取双倍奖励</p>
         </div>
-        <input type="number" id="marginInput" placeholder="输入保证金 BNB" step="0.001">
-        <div class="btn-group">
-            <button class="leverage-btn active" data-lv="1">1倍</button>
-            <button class="leverage-btn" data-lv="2">2倍</button>
-            <button class="leverage-btn" data-lv="3">3倍</button>
-            <button class="leverage-btn" data-lv="5">5倍</button>
+        <div style="display: flex; gap: 16px; align-items: center;">
+            <div class="social-links">
+                <a href="https://t.me/ribendui888" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+                <a href="https://x.com/japancto?s=21" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+            </div>
+            <div id="walletContainer">
+                <button id="connectWalletBtn" class="wallet-btn"><i class="fas fa-wallet"></i> 连接钱包 (BSC)</button>
+            </div>
         </div>
-        <button id="openBtn" class="btn btn-primary">确认开仓</button>
     </div>
 
-    <div class="card">
-        <h3>我的持仓</h3>
-        <div id="positionsList">暂无持仓记录</div>
+    <div class="token-bar" id="tokenBar" style="display: none;">
+        <div class="token-info">
+            <div class="token-icon"><i class="fas fa-coins"></i></div>
+            <div>
+                <div><strong>🇯🇵 日本队代币 (JPN)</strong> 余额</div>
+                <div><span id="tokenBalanceDisplay" class="token-balance">0.00</span> <span style="font-size:0.9rem;">TOKEN</span></div>
+            </div>
+        </div>
+        <div class="cost-badge">
+            <i class="fas fa-ticket-alt"></i> 每笔预测消耗 <strong style="font-size:1.2rem;">10</strong> 枚日本队代币 | 猜对奖励 <strong>20枚</strong>！
+        </div>
     </div>
 
-<script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <div class="section-title">
+        <i class="fas fa-trophy" style="color:#F5A623; font-size: 1.8rem;"></i> 2026 巅峰对决 · 立即预测
+        <span style="font-size:0.8rem; margin-left:auto;"><i class="fas fa-chart-line"></i> 选择你的冠军之路</span>
+    </div>
+    <div id="matchesGrid" class="matches-grid">
+        <!-- 动态比赛卡片 -->
+    </div>
+    <footer>
+        <span><i class="fas fa-shield-alt"></i> 去中心化预测 · BSC智能合约</span>
+        <a href="https://t.me/ribendui888" target="_blank"><i class="fab fa-telegram"></i> 官方电报群</a>
+        <a href="https://x.com/japancto?s=21" target="_blank"><i class="fab fa-twitter"></i> 官方推特</a>
+        <span>⚡ 消耗代币: 日本队社区代币</span>
+    </footer>
+</div>
+<div id="toastMsg" class="toast-notify" style="display: none;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
-// 替换为你实际部署的金库合约地址
-const VAULT_ADDR = "0xfE133fa0e8a737384b67C4CACfDEaD427090e51f";
-const VAULT_ABI = [
-    "function openPosition(bool isLong,uint256 leverage)external payable returns(uint256)",
-    "function closePosition(uint256 id)external returns(int256)",
-    "function getUserPositions(address)external view returns(uint256[])",
-    "function getPosition(uint256)external view returns(address,bool,uint256,uint256,uint256,uint256,bool,int256)"
-];
-
-let provider,signer,vault;
-let isLong = true;
-let lever = 1;
-
-// 钱包连接
-document.getElementById("connectBtn").onclick = async()=>{
-    if(!window.ethereum)return alert("请安装MetaMask钱包");
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts",[]);
-    signer = provider.getSigner();
-    vault = new ethers.Contract(VAULT_ADDR,VAULT_ABI,signer);
-    alert("钱包连接成功");
-    loadPos();
-}
-
-// 多空切换
-document.getElementById("longBtn").onclick=()=>{
-    isLong=true;
-    document.getElementById("longBtn").classList.add("active");
-    document.getElementById("shortBtn").classList.remove("active");
-}
-document.getElementById("shortBtn").onclick=()=>{
-    isLong=false;
-    document.getElementById("shortBtn").classList.add("active");
-    document.getElementById("longBtn").classList.remove("active");
-}
-
-// 杠杆选择
-document.querySelectorAll(".leverage-btn").forEach(btn=>{
-    btn.onclick=()=>{
-        document.querySelectorAll(".leverage-btn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        lever = Number(btn.dataset.lv);
+    // ---------- 2026世界杯DAPP · 消耗"日本队代币" 预测逻辑 ----------
+    let web3;
+    let userAccount = null;
+    let userTokenBalance = 0;
+    const PREDICTION_COST = 10000;       // 消耗10枚日本队代币
+    const REWARD_MULTIPLIER = 20000;      // 奖励20枚
+    
+    // 比赛数据 (激情世界杯小组赛)
+    let matches = [
+        { id: 1, home: "🇧🇷 巴西", away: "🇫🇷 法国", date: "2026-06-12 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 2, home: "🇦🇷 阿根廷", away: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格兰", date: "2026-06-14 18:00", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 3, home: "🇩🇪 德国", away: "🇪🇸 西班牙", date: "2026-06-15 20:00", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 4, home: "🇵🇹 葡萄牙", away: "🇳🇱 荷兰", date: "2026-06-17 15:30", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 5, home: "🇺🇸 美国", away: "🇲🇽 墨西哥", date: "2026-06-19 12:00", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 6, home: "🇯🇵 日本", away: "🇰🇷 韩国", date: "2026-06-21 19:00", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 7, home: "🇭🇷 克罗地亚", away: "🇧🇪 比利时", date: "2026-06-23 21:00", status: "upcoming", userPick: null, resolved: false, result: null },
+        { id: 8, home: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 乌拉圭", away: "🇨🇴 哥伦比亚", date: "2026-06-25 17:00", status: "upcoming", userPick: null, resolved: false, result: null }
+    ];
+    
+    let userPredictions = {}; // { matchId: { pick: 'win'/'lose'/'draw', submitted: true } }
+    
+    const connectBtn = document.getElementById('connectWalletBtn');
+    const walletContainer = document.getElementById('walletContainer');
+    const tokenBar = document.getElementById('tokenBar');
+    const tokenBalanceSpan = document.getElementById('tokenBalanceDisplay');
+    const matchesGrid = document.getElementById('matchesGrid');
+    const toastMsgDiv = document.getElementById('toastMsg');
+    
+    function showToast(message, isError = false) {
+        toastMsgDiv.innerText = message;
+        toastMsgDiv.style.display = 'block';
+        toastMsgDiv.style.background = isError ? '#8b2c1ae6' : '#1f2b38e6';
+        toastMsgDiv.style.borderLeftColor = isError ? '#ff6b4a' : '#F5A623';
+        setTimeout(() => {
+            toastMsgDiv.style.display = 'none';
+        }, 3800);
     }
-})
-
-// 开仓
-document.getElementById("openBtn").onclick=async()=>{
-    if(!vault)return alert("先连接钱包");
-    let val = document.getElementById("marginInput").value;
-    if(!val||val<=0)return alert("输入合法保证金");
-    try{
-        let tx = await vault.openPosition(isLong,lever,{value:ethers.utils.parseEther(val)});
-        await tx.wait();
-        alert("开仓成功");
-        loadPos();
-    }catch(e){alert("交易失败："+e.message)}
-}
-
-// 加载持仓
-async function loadPos(){
-    if(!vault)return;
-    let addr = await signer.getAddress();
-    let ids = await vault.getUserPositions(addr);
-    let box = document.getElementById("positionsList");
-    if(ids.length===0){box.innerHTML="暂无持仓记录";return}
-    box.innerHTML="";
-    for(let id of ids){
-        let p = await vault.getPosition(id);
-        let div = document.createElement("div");
-        div.className="pos-item";
-        div.innerHTML=`
-            <p>仓位ID：${id}</p>
-            <p>方向：${p[1]?"多头":"空头"}</p>
-            <p>保证金：${ethers.utils.formatEther(p[2])} BNB</p>
-            <p>杠杆：${p[3]}倍</p>
-            <p>实时盈亏：${p[7].toString()}</p>
-            <button onclick="closePos(${id})" class="btn btn-danger" style="width:100%;margin-top:8px">平仓</button>
-        `;
-        box.appendChild(div);
+    
+    // 模拟获取代币余额（本地存储模拟，每个新地址赠送80枚日本队代币便于测试）
+    async function fetchTokenBalance(account) {
+        if (!account) return 0;
+        let storageKey = `japan_token_balance_${account.toLowerCase()}`;
+        let balance = localStorage.getItem(storageKey);
+        if (balance === null) {
+            balance = 80; // 初始80枚日本队代币
+            localStorage.setItem(storageKey, balance);
+        } else {
+            balance = parseInt(balance, 10);
+        }
+        return balance;
     }
-}
-
-// 平仓
-window.closePos = async(id)=>{
-    if(!vault)return;
-    try{
-        await vault.closePosition(id);
-        alert("平仓完成");
-        loadPos();
-    }catch(e){alert("平仓失败："+e.message)}
-}
+    
+    async function updateBalanceUI() {
+        if (userAccount) {
+            let bal = await fetchTokenBalance(userAccount);
+            userTokenBalance = bal;
+            tokenBalanceSpan.innerText = bal.toFixed(2);
+        } else {
+            tokenBalanceSpan.innerText = '0.00';
+        }
+    }
+    
+    async function modifyTokenBalance(account, delta) {
+        let storageKey = `japan_token_balance_${account.toLowerCase()}`;
+        let current = await fetchTokenBalance(account);
+        let newBalance = current + delta;
+        if (newBalance < 0) newBalance = 0;
+        localStorage.setItem(storageKey, newBalance);
+        userTokenBalance = newBalance;
+        tokenBalanceSpan.innerText = newBalance.toFixed(2);
+        return newBalance;
+    }
+    
+    // 提交预测逻辑（消耗10日本队代币）
+    async function submitPrediction(matchId, pick) {
+        if (!userAccount) {
+            showToast("⚠️ 请先连接钱包参与预测!", true);
+            return false;
+        }
+        const match = matches.find(m => m.id === matchId);
+        if (!match) return false;
+        if (match.resolved) {
+            showToast("🏁 本场比赛已结束，无法预测", true);
+            return false;
+        }
+        if (userPredictions[matchId] && userPredictions[matchId].submitted) {
+            showToast("⛔ 你已经预测过本场，不可修改预测", true);
+            return false;
+        }
+        let currentBalance = await fetchTokenBalance(userAccount);
+        if (currentBalance < PREDICTION_COST) {
+            showToast(`❌ 日本队代币余额不足！需要 ${PREDICTION_COST} 枚，点击“领取测试代币”继续预测`, true);
+            return false;
+        }
+        
+        showToast(`⏳ 正在提交预测... 消耗 10 枚日本队代币`, false);
+        return new Promise(async (resolve) => {
+            setTimeout(async () => {
+                await modifyTokenBalance(userAccount, -PREDICTION_COST);
+                userPredictions[matchId] = { pick: pick, submitted: true };
+                renderMatches();
+                showToast(`✅ 预测成功！ 押注 ${pick === 'win' ? match.home + '胜' : (pick === 'lose' ? match.away + '胜' : '平局')} ，消耗 10 日本队代币，坐等开奖`, false);
+                resolve(true);
+            }, 700);
+        });
+    }
+    
+    // 结算比赛并发放奖励（奖励20日本队代币）
+    async function resolveMatchAndReward(matchId, winnerResult) {
+        const match = matches.find(m => m.id === matchId);
+        if (!match || match.resolved) return;
+        match.resolved = true;
+        match.result = winnerResult;
+        const userPred = userPredictions[matchId];
+        if (userPred && userPred.submitted && userPred.pick === winnerResult) {
+            const rewardAmount = PREDICTION_COST * REWARD_MULTIPLIER; // 20
+            await modifyTokenBalance(userAccount, rewardAmount);
+            showToast(`🎉🎉 惊天大胜！预测正确！获得 ${rewardAmount} 枚日本队代币奖励！`, false);
+        } else if (userPred && userPred.submitted) {
+            showToast(`😢 很遗憾，预测未中，结果: ${winnerResult === 'win' ? match.home+'胜' : (winnerResult === 'lose' ? match.away+'胜' : '平局')}，下次再战！`, false);
+        } else {
+            showToast(`📢 比赛结果已出: ${winnerResult === 'win' ? match.home+'胜' : (winnerResult === 'lose' ? match.away+'胜' : '平局')} ，您未参与本场预测`, false);
+        }
+        renderMatches();
+    }
+    
+    // 领取测试代币
+    async function faucetTokens() {
+        if (!userAccount) {
+            showToast("请先连接钱包再领取测试代币", true);
+            return;
+        }
+        await modifyTokenBalance(userAccount, 40);
+        showToast("🎁 领取成功！获得 40 枚 🇯🇵 日本队代币，尽情预测世界杯！", false);
+    }
+    
+    // 渲染所有比赛卡片
+    function renderMatches() {
+        if (!matchesGrid) return;
+        matchesGrid.innerHTML = '';
+        for (let match of matches) {
+            const predRecord = userPredictions[match.id] || { pick: null, submitted: false };
+            const isSubmitted = predRecord.submitted;
+            const selectedPick = predRecord.pick;
+            const isResolved = match.resolved;
+            const card = document.createElement('div');
+            card.className = 'match-card';
+            card.innerHTML = `
+                <div class="match-date">
+                    <span><i class="far fa-calendar-alt"></i> ${match.date}</span>
+                    <span><i class="fas fa-globe-asia"></i> 小组赛 · 焦点战</span>
+                </div>
+                <div class="teams">
+                    <div class="team"><strong>${match.home}</strong></div>
+                    <div class="vs">⚡ VS ⚡</div>
+                    <div class="team"><strong>${match.away}</strong></div>
+                </div>
+                <div class="prediction-buttons">
+                    <button class="pred-btn win ${selectedPick === 'win' && !isSubmitted ? 'active' : ''} ${isSubmitted ? 'disabled-btn' : ''}" data-pick="win" ${isSubmitted || isResolved ? 'disabled' : ''}><i class="fas fa-flag-checkered"></i> ${match.home} 胜</button>
+                    <button class="pred-btn draw ${selectedPick === 'draw' && !isSubmitted ? 'active' : ''} ${isSubmitted ? 'disabled-btn' : ''}" data-pick="draw" ${isSubmitted || isResolved ? 'disabled' : ''}><i class="fas fa-handshake"></i> 平局</button>
+                    <button class="pred-btn lose ${selectedPick === 'lose' && !isSubmitted ? 'active' : ''} ${isSubmitted ? 'disabled-btn' : ''}" data-pick="lose" ${isSubmitted || isResolved ? 'disabled' : ''}><i class="fas fa-futbol"></i> ${match.away} 胜</button>
+                </div>
+                ${!isResolved ? `
+                    <button class="submit-pred" data-matchid="${match.id}" ${isSubmitted ? 'disabled' : ''}>${isSubmitted ? '✓ 已预测 · 等待开奖' : '🔥 消耗10枚日本队代币 预测赢家 🔥'}</button>
+                    ${isSubmitted ? '<div class="status-msg"><i class="fas fa-check-circle"></i> 已提交预测，若猜中获得20日本队代币</div>' : '<div class="status-msg"><i class="fas fa-coins"></i> 预测消耗10 日本队代币 | 猜中赢双倍</div>'}
+                ` : `
+                    <div class="status-msg"><i class="fas fa-chart-line"></i> 结果已揭晓：${match.result === 'win' ? match.home+'胜' : (match.result === 'lose' ? match.away+'胜' : '平局')} ${predRecord.submitted && predRecord.pick === match.result ? '🏆 你猜对了! +20代币' : (predRecord.submitted ? '❌ 猜错啦' : '未参与')}</div>
+                `}
+            `;
+            matchesGrid.appendChild(card);
+        }
+        // 绑定提交事件
+        document.querySelectorAll('.submit-pred').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const matchId = parseInt(btn.getAttribute('data-matchid'));
+                if (userPredictions[matchId]?.submitted) {
+                    showToast("不可重复预测", true);
+                    return;
+                }
+                const parentCard = btn.closest('.match-card');
+                const activePickBtn = parentCard.querySelector('.pred-btn.active');
+                if (!activePickBtn) {
+                    showToast("请先选择胜负/平局", true);
+                    return;
+                }
+                let pick = activePickBtn.getAttribute('data-pick');
+                await submitPrediction(matchId, pick);
+            });
+        });
+        // 选项高亮切换
+        document.querySelectorAll('.pred-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.disabled) return;
+                const parent = btn.closest('.match-card');
+                parent.querySelectorAll('.pred-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    }
+    
+    // 添加额外控制栏 (领取代币 + 模拟结算)
+    function addExtraControls() {
+        const tokenBarDiv = document.querySelector('.token-bar');
+        if (tokenBarDiv && !document.getElementById('faucetBtn')) {
+            const extraDiv = document.createElement('div');
+            extraDiv.style.display = 'flex';
+            extraDiv.style.gap = '12px';
+            extraDiv.innerHTML = `<button id="faucetBtn" class="wallet-btn" style="background:#2a3b2c; padding:8px 16px;"><i class="fas fa-tint"></i> 领取测试代币 (+40)</button>
+                                   <button id="simulateResultBtn" class="wallet-btn" style="background:#2a2e3f; padding:8px 16px;"><i class="fas fa-dice-d6"></i> 模拟随机赛果结算</button>`;
+            tokenBarDiv.appendChild(extraDiv);
+            document.getElementById('faucetBtn').addEventListener('click', faucetTokens);
+            document.getElementById('simulateResultBtn').addEventListener('click', async () => {
+                if (!userAccount) { showToast("请连接钱包后测试结算", true); return; }
+                const unresolved = matches.filter(m => !m.resolved);
+                if (unresolved.length === 0) { showToast("所有比赛已结算", false); return; }
+                const randomMatch = unresolved[Math.floor(Math.random() * unresolved.length)];
+                const outcomes = ['win', 'lose', 'draw'];
+                const randOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+                await resolveMatchAndReward(randomMatch.id, randOutcome);
+                renderMatches();
+            });
+        }
+    }
+    
+    // 连接钱包 BSC
+    async function connectWallet() {
+        if (window.ethereum) {
+            try {
+                web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await web3.eth.getAccounts();
+                if (accounts.length > 0) {
+                    userAccount = accounts[0];
+                    const chainId = await web3.eth.getChainId();
+                    if (chainId !== 56 && chainId !== 97) {
+                        showToast("请切换至BSC网络 (主网56 或 测试网97) 获得最佳体验", true);
+                    }
+                    const shortAddr = userAccount.slice(0,6)+'...'+userAccount.slice(-4);
+                    walletContainer.innerHTML = `<div class="wallet-address" style="background:#00000066; border-radius:40px; padding:8px 20px;"><i class="fas fa-link"></i> ${shortAddr}</div>`;
+                    tokenBar.style.display = 'flex';
+                    await updateBalanceUI();
+                    renderMatches();
+                    addExtraControls();
+                    showToast(`钱包已连接: ${shortAddr} | 欢迎使用日本队代币参与预测！`, false);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("连接钱包失败，请确保MetaMask可用", true);
+            }
+        } else {
+            showToast("请安装MetaMask或支持BSC的钱包插件!", true);
+        }
+    }
+    
+    connectBtn.addEventListener('click', connectWallet);
+    renderMatches();
+    if (window.ethereum && window.ethereum.selectedAddress) {
+        connectWallet();
+    }
+    if (window.ethereum) {
+        window.ethereum.on('accountsChanged', (accounts) => {
+            if(accounts.length) { userAccount = accounts[0]; updateBalanceUI(); renderMatches(); addExtraControls(); showToast("账户已切换", false); }
+            else { userAccount = null; tokenBar.style.display = 'none'; renderMatches(); walletContainer.innerHTML = '<button id="connectWalletBtn" class="wallet-btn"><i class="fas fa-wallet"></i> 连接钱包 (BSC)</button>'; document.getElementById('connectWalletBtn').addEventListener('click', connectWallet); }
+        });
+        window.ethereum.on('chainChanged', () => window.location.reload());
+    }
 </script>
 </body>
 </html>
