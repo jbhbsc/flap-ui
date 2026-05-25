@@ -1,724 +1,1190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>2026世界杯预测DApp | 日本队·链上应援</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            color: #f0f3fa;
-            min-height: 100vh;
-            padding: 1.5rem;
-            position: relative;
-            background: #03050b;
-        }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(125deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 100%),
-                url('https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=2070&auto=format');
-            background-size: cover;
-            background-position: center 30%;
-            background-repeat: no-repeat;
-            z-index: -2;
-            filter: brightness(0.85) contrast(1.1);
-        }
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: radial-gradient(circle at 20% 40%, rgba(255, 80, 40, 0.15) 0%, rgba(0,0,0,0) 60%),
-                              repeating-linear-gradient(45deg, rgba(255,215,0,0.02) 0px, rgba(255,215,0,0.02) 2px, transparent 2px, transparent 8px);
-            pointer-events: none;
-            z-index: -1;
-        }
-        .stadium-glow {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(to top, #ffb34730, transparent);
-            pointer-events: none;
-            z-index: -1;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 2.5rem;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(12px);
-            border-radius: 60px;
-            padding: 0.8rem 2rem;
-            border: 1px solid rgba(255, 180, 60, 0.6);
-            box-shadow: 0 8px 28px rgba(0,0,0,0.5);
-        }
-        .logo-area h1 {
-            font-family: 'Orbitron', monospace;
-            font-weight: 800;
-            background: linear-gradient(135deg, #FFE55C, #FF8C2E);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 1.9rem;
-            letter-spacing: 1px;
-            text-shadow: 0 0 8px #ff6a00;
-        }
-        .logo-area p {
-            font-size: 0.8rem;
-            color: #ffe6b3;
-            letter-spacing: 1px;
-        }
-        .social-links {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        .social-links a {
-            color: #ffde9c;
-            font-size: 1.6rem;
-            transition: all 0.2s;
-            background: rgba(0,0,0,0.5);
-            width: 44px;
-            height: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            backdrop-filter: blur(4px);
-        }
-        .social-links a:hover {
-            color: #FFB347;
-            transform: scale(1.08);
-            background: rgba(0,0,0,0.7);
-        }
-        .wallet-btn {
-            background: linear-gradient(95deg, #1e2a3a, #0a111c);
-            border: 1px solid #f5a623;
-            padding: 12px 28px;
-            border-radius: 48px;
-            font-weight: bold;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            color: #ffde9c;
-            font-family: 'Inter', sans-serif;
-        }
-        .wallet-btn i {
-            font-size: 1.3rem;
-        }
-        .wallet-btn:hover {
-            background: #f5a62330;
-            border-color: #ffcf70;
-            color: #fff3cf;
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(245,166,35,0.5);
-        }
-        .token-bar {
-            background: linear-gradient(115deg, rgba(0,0,0,0.7), rgba(20,30,45,0.85));
-            backdrop-filter: blur(10px);
-            border-radius: 36px;
-            padding: 1rem 2rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            border-left: 8px solid #FFB347;
-            border-right: 1px solid #ffb34760;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        .token-info {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            font-weight: 600;
-        }
-        .token-icon {
-            background: #f5b04230;
-            border-radius: 60px;
-            padding: 12px;
-            font-size: 2rem;
-        }
-        .token-balance {
-            font-size: 1.9rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #FFD966, #FFA559);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .cost-badge {
-            background: #ff8c2e30;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            border: 1px solid #ffb347;
-        }
-        .section-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin: 2rem 0 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 6px solid #F5A623;
-            padding-left: 24px;
-            text-shadow: 0 2px 4px black;
-            background: linear-gradient(90deg, rgba(0,0,0,0.4), transparent);
-        }
-        .matches-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 28px;
-            margin-top: 20px;
-        }
-        .match-card {
-            background: rgba(8, 16, 26, 0.75);
-            backdrop-filter: blur(12px);
-            border-radius: 40px;
-            padding: 1.4rem 1.2rem 1.6rem;
-            transition: all 0.25s;
-            border: 1px solid rgba(255, 180, 70, 0.4);
-            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.5);
-        }
-        .match-card:hover {
-            transform: translateY(-8px);
-            border-color: #ffcd7e;
-            background: rgba(20, 35, 50, 0.85);
-        }
-        .match-date {
-            font-size: 0.8rem;
-            color: #ffdd99;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .teams {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 800;
-            font-size: 1.35rem;
-            margin: 15px 0;
-        }
-        .team {
-            text-align: center;
-            flex: 1;
-            font-weight: 700;
-        }
-        .vs {
-            font-size: 1rem;
-            background: #F5A62330;
-            padding: 6px 14px;
-            border-radius: 60px;
-            font-weight: bold;
-            color: #ffd966;
-        }
-        .prediction-buttons {
-            display: flex;
-            gap: 12px;
-            margin: 20px 0 12px;
-        }
-        .pred-btn {
-            flex: 1;
-            background: #15232e;
-            border: none;
-            padding: 10px 0;
-            border-radius: 60px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: 0.15s;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .pred-btn.active {
-            background: #F5A623;
-            color: #0a0f1e;
-            box-shadow: 0 0 12px #ffb347;
-        }
-        .pred-btn.win:hover { background: #2c8c5e; }
-        .pred-btn.lose:hover { background: #bc5a3c; }
-        .pred-btn.draw:hover { background: #5f7f9e; }
-        .bet-amount-input-container {
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .bet-amount-input-container label {
-            font-size: 0.9rem;
-            color: #ffdd99;
-            font-weight: 600;
-        }
-        .bet-amount-input {
-            flex: 1;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255, 180, 70, 0.6);
-            border-radius: 30px;
-            padding: 8px 16px;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-        .bet-amount-input:focus {
-            outline: none;
-            border-color: #ffcd7e;
-            box-shadow: 0 0 8px rgba(255, 180, 70, 0.5);
-        }
-        .submit-pred {
-            width: 100%;
-            background: linear-gradient(95deg, #F5A623, #E67E00);
-            border: none;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: bold;
-            margin-top: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s;
-            color: #111;
-            font-weight: 800;
-        }
-        .submit-pred:disabled {
-            background: #555;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .status-msg {
-            font-size: 0.7rem;
-            margin-top: 10px;
-            text-align: center;
-            color: #ffd7a0;
-        }
-        footer {
-            text-align: center;
-            margin-top: 4rem;
-            padding: 2rem;
-            color: #ffdd99;
-            background: rgba(0,0,0,0.4);
-            border-radius: 60px;
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            gap: 28px;
-            flex-wrap: wrap;
-        }
-        footer a {
-            color: #ffcd7e;
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        footer a:hover {
-            color: white;
-            text-decoration: underline;
-        }
-        @media (max-width: 700px) {
-            .header { flex-direction: column; align-items: stretch; border-radius: 32px; }
-            .token-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .teams { font-size: 1rem; }
-            .social-links { justify-content: center; margin-top: 8px; }
-        }
-        .toast-notify {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1f2b38e6;
-            backdrop-filter: blur(12px);
-            padding: 12px 28px;
-            border-radius: 50px;
-            border-left: 5px solid #F5A623;
-            font-size: 0.9rem;
-            z-index: 999;
-            pointer-events: none;
-            font-weight: 500;
-        }
-        #adminPanel{margin:20px 0;padding:15px 20px;background:rgba(0,0,0,0.6);border-radius:20px;border:1px solid #f44336;}
-        #adminPanel h3{color:#f44336;margin-bottom:10px;}
-        #adminPanel div{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-        #adminPanel select{padding:8px 12px;border-radius:10px;flex:1;min-width:140px;}
-        #adminResolveBtn{background:#f44336;color:#fff;padding:8px 16px;border:none;border-radius:10px;cursor:pointer;}
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CBA Finals Predictor</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #080912;
+      --panel: rgba(9, 12, 24, 0.74);
+      --line: rgba(255, 255, 255, 0.13);
+      --text: #f6f8ff;
+      --muted: #9ea7bd;
+      --red: #ff315d;
+      --blue: #21a8ff;
+      --cyan: #36f5ff;
+      --gold: #ffc857;
+      --green: #43e88d;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255, 49, 93, 0.2), transparent 26rem),
+        radial-gradient(circle at 82% 14%, rgba(33, 168, 255, 0.2), transparent 28rem),
+        linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 64px),
+        repeating-linear-gradient(90deg, #17100c 0 8px, #21150e 8px 16px, #27180f 16px 24px);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -25%;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(255,255,255,.2), transparent 22%),
+        radial-gradient(ellipse at 68% 35%, rgba(255,255,255,.16), transparent 24%);
+      mix-blend-mode: screen;
+      animation: lights 16s linear infinite;
+      opacity: .38;
+      z-index: 0;
+    }
+
+    @keyframes lights {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: radial-gradient(circle at 35% 25%, #fff3 0 15%, transparent 16%), linear-gradient(135deg, var(--red), var(--blue));
+      box-shadow: 0 0 24px rgba(255, 200, 87, .2);
+      font-size: 25px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 42px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .tagline {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .wallet-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .wallet-state {
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.28);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      max-width: 360px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .social-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      padding: 0;
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.08);
+      font-weight: 800;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .social-link svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+
+    .social-link.telegram {
+      border-color: rgba(42, 171, 238, .45);
+      background: #2aabee;
+    }
+
+    .social-link.x-social {
+      border-color: rgba(255, 255, 255, .2);
+      background: rgba(0,0,0,.38);
+    }
+
+    .social-link:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 34px rgba(0,0,0,.28);
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease, border-color .18s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: scale(1.02);
+      box-shadow: 0 12px 34px rgba(0,0,0,.28);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .48;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #f83c5c, #ffb545);
+      padding: 12px 16px;
+      font-weight: 800;
+    }
+
+    .ghost-btn {
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      padding: 11px 14px;
+      font-weight: 700;
+    }
+
+    .notice {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 200, 87, .32);
+      border-radius: 8px;
+      color: #ffe7a3;
+      background: rgba(255, 200, 87, .08);
+      display: none;
+    }
+
+    .schedule {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 8px 2px 18px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .game-tab {
+      min-width: 132px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.34);
+      backdrop-filter: blur(12px);
+      text-align: left;
+      scroll-snap-align: start;
+    }
+
+    .game-tab.active {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px rgba(255, 200, 87, .3), 0 0 26px rgba(255, 200, 87, .18);
+      transform: scale(1.03);
+    }
+
+    .game-tab .g {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+      color: white;
+    }
+
+    .game-tab .date {
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border-radius: 999px;
+      padding: 3px 8px;
+      margin-top: 9px;
+      font-size: 12px;
+      color: #10131f;
+      background: var(--gold);
+      font-weight: 800;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .team-card, .center-panel, .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      border-radius: 8px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .28);
+    }
+
+    .team-card {
+      position: relative;
+      min-height: 330px;
+      padding: 22px;
+      overflow: hidden;
+    }
+
+    .team-card.red {
+      border-color: rgba(255, 49, 93, .45);
+      box-shadow: inset 0 0 0 1px rgba(255,49,93,.14), 0 0 34px rgba(255, 49, 93, .15);
+    }
+
+    .team-card.blue {
+      border-color: rgba(54, 245, 255, .42);
+      box-shadow: inset 0 0 0 1px rgba(54,245,255,.13), 0 0 34px rgba(33, 168, 255, .14);
+    }
+
+    .team-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,.08), transparent);
+      transform: translateX(-120%);
+      animation: sheen 8s ease-in-out infinite;
+    }
+
+    @keyframes sheen {
+      0%, 55% { transform: translateX(-120%); }
+      72%, 100% { transform: translateX(120%); }
+    }
+
+    .silhouette {
+      position: absolute;
+      right: 12px;
+      bottom: -8px;
+      width: 180px;
+      height: 250px;
+      opacity: .16;
+      filter: blur(.2px);
+    }
+
+    .team-logo {
+      position: relative;
+      z-index: 3;
+      width: min(150px, 42vw);
+      height: 118px;
+      display: block;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 12px 22px rgba(0,0,0,.36));
+    }
+
+    .team-card.blue .team-logo {
+      width: min(142px, 40vw);
+    }
+
+    .team-title {
+      position: relative;
+      z-index: 2;
+      margin: 20px 0 8px;
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.02;
+      font-weight: 1000;
+      text-shadow: 0 0 24px currentColor;
+    }
+
+    .team-card.red .team-title { color: #ff6a88; }
+    .team-card.blue .team-title { color: #66d8ff; }
+
+    .team-subtitle {
+      position: relative;
+      z-index: 2;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .team-stats {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 34px;
+    }
+
+    .mini-stat {
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .mini-stat b {
+      display: block;
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .ball {
+      position: relative;
+      z-index: 2;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.65), transparent 12%),
+        linear-gradient(135deg, #ff9a2f, #b64d12);
+      box-shadow: inset -8px -10px 16px rgba(0,0,0,.25), 0 12px 24px rgba(0,0,0,.25);
+      animation: spinFloat 4.5s ease-in-out infinite;
+    }
+
+    .ball::before, .ball::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 2px solid rgba(40, 15, 8, .65);
+      border-left: 0;
+      border-right: 0;
+      border-radius: 50%;
+      transform: rotate(28deg);
+    }
+
+    .ball::after {
+      inset: 0 27px;
+      border: 0;
+      border-left: 2px solid rgba(40, 15, 8, .7);
+      transform: rotate(15deg);
+    }
+
+    @keyframes spinFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(18deg); }
+    }
+
+    .floating-ball {
+      position: fixed;
+      width: 84px;
+      height: 84px;
+      opacity: .32;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-ball.left { left: 4vw; top: 34vh; }
+    .floating-ball.right { right: 5vw; top: 62vh; animation-delay: -2s; }
+
+    .center-panel {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .versus {
+      font-size: 54px;
+      line-height: 1;
+      font-weight: 1000;
+      color: white;
+      text-shadow: 0 0 28px rgba(255, 200, 87, .44);
+    }
+
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+
+    .timebox {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      padding: 10px 4px;
+    }
+
+    .timebox b {
+      display: block;
+      color: var(--gold);
+      font-size: 22px;
+      animation: tickPop .8s ease infinite;
+    }
+
+    @keyframes tickPop {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-1px); }
+    }
+
+    .pool-value {
+      font-size: 28px;
+      font-weight: 1000;
+      color: var(--green);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    .bet-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      padding: 13px 12px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(255, 200, 87, .12);
+    }
+
+    .cost {
+      min-width: 160px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 12px;
+      color: var(--muted);
+      background: rgba(0,0,0,.22);
+    }
+
+    .cost b {
+      display: block;
+      color: white;
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .bet-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .team-bet {
+      min-height: 58px;
+      font-weight: 900;
+      padding: 14px;
+    }
+
+    .team-bet.red { background: linear-gradient(135deg, #ff315d, #7d1cff); }
+    .team-bet.blue { background: linear-gradient(135deg, #137cff, #22f1ff); }
+
+    .claim-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .records {
+      display: grid;
+      gap: 8px;
+    }
+
+    .record {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+    }
+
+    .record strong { color: white; }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      min-width: 230px;
+      padding: 13px 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(7, 10, 19, .88);
+      backdrop-filter: blur(14px);
+      transform: translateY(130%);
+      transition: transform .25s ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+
+    .toast.show { transform: translateY(0); }
+    .toast.ok { border-color: rgba(67, 232, 141, .4); }
+    .toast.err { border-color: rgba(255, 49, 93, .45); }
+
+    .particle {
+      position: fixed;
+      z-index: 30;
+      pointer-events: none;
+      font-size: 24px;
+      animation: fly 1.4s ease-out forwards;
+    }
+
+    @keyframes fly {
+      from { transform: translateY(0) scale(.6) rotate(0deg); opacity: 1; }
+      to { transform: translateY(-160px) scale(1.4) rotate(80deg); opacity: 0; }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .center-panel { order: -1; }
+      .team-card { min-height: 280px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .wallet-box { justify-content: flex-start; }
+    }
+
+    @media (max-width: 560px) {
+      .app { width: min(100% - 20px, 1240px); }
+      .bet-buttons, .bet-controls, .team-stats {
+        grid-template-columns: 1fr;
+      }
+      .countdown { grid-template-columns: repeat(2, 1fr); }
+      .team-title { font-size: 32px; }
+    }
+  </style>
 </head>
 <body>
-<div class="stadium-glow"></div>
-<div class="container">
-    <div class="header">
-        <div class="logo-area">
-            <h1><i class="fas fa-futbol"></i> 2026 WORLD CUP <span style="color:#FFB347;">⚡ 日本队·应援预测</span></h1>
-            <p><i class="fas fa-fire"></i> 链上荣耀 | 消耗 🇯🇵 日本队代币 预测输赢 | 赢取双倍奖励</p>
-             <p style="font-size:0.75rem; color:#ffd700; margin-top:3px;">
-     📝 合约地址：0xb36730b2be974a0277fa3168d74e01bd659e7777
-    </p>
-        </div>
-        <div style="display: flex; gap: 16px; align-items: center;">
-            <div class="social-links">
-                <a href="https://t.me/ribendui888" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
-                <a href="https://x.com/japancto?s=21" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
-            </div>
-            <div id="walletContainer">
-                <button id="connectWalletBtn" class="wallet-btn"><i class="fas fa-wallet"></i> 连接钱包 (BSC)</button>
-            </div>
-        </div>
-    </div>
+  <div class="floating-ball ball left"></div>
+  <div class="floating-ball ball right"></div>
 
-    <div class="token-bar" id="tokenBar" style="display: none;">
-        <div class="token-info">
-            <div class="token-icon"><i class="fas fa-coins"></i></div>
-            <div>
-                <div><strong>🇯🇵 日本队代币 (JPN)</strong> 余额</div>
-                <div><span id="tokenBalanceDisplay" class="token-balance">0.0000</span> <span style="font-size:0.9rem;">TOKEN</span></div>
-            </div>
-        </div>
-        <div class="cost-badge">
-            <i class="fas fa-ticket-alt"></i> 每笔预测消耗自定义数量代币 | 猜对奖励双倍金额！
-        </div>
-    </div>
-
-    <div id="adminPanel" style="display:none;">
-        <h3>⚙️ 管理员后台 · 比赛结算</h3>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🏀</div>
         <div>
-            <select id="adminMatchSelect"></select>
-            <select id="adminResultSelect">
-                <option value="win">主队胜利</option>
-                <option value="lose">客队胜利</option>
-                <option value="draw">平局</option>
-            </select>
-            <button id="adminResolveBtn">✅ 一键结算</button>
+          <h1>CBA Finals Predictor</h1>
+          <div class="tagline">燃烧 CBA 代币，竞猜总冠军</div>
         </div>
-    </div>
+      </div>
+      <div class="wallet-box">
+        <div class="social-links">
+          <a class="social-link telegram" id="telegramLink" href="#" target="_blank" rel="noopener" aria-label="Telegram">
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <path fill="#fff" d="M27.5 6.1 23.6 25c-.3 1.3-1.1 1.6-2.2 1l-6.1-4.5-3 2.9c-.3.3-.6.6-1.3.6l.5-6.2L22.8 8.9c.5-.4-.1-.7-.7-.3L8 17.5l-6-1.9c-1.3-.4-1.3-1.3.3-1.9L25.8 4.6c1.1-.4 2.1.3 1.7 1.5Z"/>
+            </svg>
+          </a>
+          <a class="social-link x-social" id="xLink" href="#" target="_blank" rel="noopener" aria-label="X">
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <path fill="#fff" d="M18.8 13.7 29.7 1h-2.6l-9.5 11L10.1 1H1.4l11.4 16.6L1.4 31h2.6l10-11.7L22 31h8.7L18.8 13.7Zm-3.5 4.1-1.2-1.7L5 3h3.9l7.4 10.6 1.2 1.7L27.1 29h-3.9l-7.9-11.2Z"/>
+            </svg>
+          </a>
+        </div>
+        <div class="wallet-state" id="walletState">未连接钱包</div>
+        <button class="ghost-btn" id="disconnectBtn" style="display:none">断开</button>
+        <button class="primary-btn" id="connectBtn">连接钱包</button>
+      </div>
+    </header>
 
-    <div class="section-title">
-        <i class="fas fa-trophy" style="color:#F5A623; font-size: 1.8rem;"></i> 2026 巅峰对决 · 立即预测
-        <span style="font-size:0.8rem; margin-left:auto;"><i class="fas fa-chart-line"></i> 选择你的冠军之路</span>
-    </div>
-    <div id="matchesGrid" class="matches-grid"></div>
+    <div class="notice" id="networkNotice"></div>
 
-    <footer>
-        <span><i class="fas fa-shield-alt"></i> 去中心化预测 · BSC智能合约</span>
-        <a href="https://t.me/ribendui888" target="_blank"><i class="fab fa-telegram"></i> 官方电报群</a>
-        <a href="https://x.com/japancto?s=21" target="_blank"><i class="fab fa-twitter"></i> 官方推特</a>
-        <span>⚡ 消耗代币: 日本队社区代币</span>
-    </footer>
-</div>
-<div id="toastMsg" class="toast-notify" style="display: none;"></div>
+    <section class="schedule" id="schedule"></section>
 
-<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-<script>
-// 合约与管理员配置
-const TOKEN_ADDRESS = "0xb36730b2be974a0277fa3168d74e01bd659e7777";
-const TOKEN_DECIMALS = 18;
+    <section class="hero-grid">
+      <article class="team-card red">
+        <svg class="team-logo shanghai-logo" viewBox="0 0 260 210" role="img" aria-label="上海久事 Sharks logo">
+          <path d="M32 44L196 16l36 58l-40 70l-72 47l-88-31l-14-72z" fill="#fff" opacity=".96"/>
+          <path d="M34 43L198 13l38 63l-42 73l-74 49l-91-32l-16-78z" fill="none" stroke="#143c77" stroke-width="11" stroke-linejoin="round"/>
+          <path d="M29 49L192 22l28 48l-38 59l-64 42l-76-26l-12-58z" fill="#f58220"/>
+          <path d="M54 66c39-30 96-39 144-19c-33 2-64 11-92 28c37-11 72-8 102 12c-54-5-98 7-134 37c26-12 53-17 83-13c-39 14-72 37-96 70c5-37 19-70 43-99c-21 9-37 22-50 39c-1-22 7-40 24-55z" fill="#143c77"/>
+          <path d="M66 127c27-36 68-56 123-58c-44 14-76 38-96 72c18-11 38-17 61-19c-22 21-45 35-70 42c-15 4-26-10-18-37z" fill="#fff"/>
+          <path d="M77 137c13-16 31-25 53-28l-21 33l33-8c-28 30-56 32-65 3z" fill="#143c77"/>
+          <text x="50" y="84" font-size="39" font-weight="1000" fill="#f58220" stroke="#143c77" stroke-width="5" paint-order="stroke" transform="skewX(-12)">SHARKS</text>
+          <text x="72" y="47" font-size="21" font-weight="900" fill="#143c77">上海 SHANGHAI</text>
+        </svg>
+        <svg class="silhouette" viewBox="0 0 160 220" aria-hidden="true">
+          <path fill="white" d="M82 25a22 22 0 1 0 0 44a22 22 0 0 0 0-44Zm-8 50c-20 4-35 17-41 42l18 5c4-12 10-20 19-24l-7 46l-28 45l17 12l28-41l30 47l18-11l-31-58l5-37c9 5 16 13 25 24l16-12c-18-26-36-41-69-38Z"/>
+        </svg>
+        <div class="team-subtitle">2026 CBA FINALS</div>
+        <div class="team-title">上海久事</div>
+        <div class="tagline">Shanghai Juss · 火焰主场</div>
+        <div class="team-stats">
+          <div class="mini-stat">我的投注<b id="myShanghaiCard">0 注</b></div>
+          <div class="mini-stat">队伍色彩<b style="color:var(--red)">RED</b></div>
+        </div>
+      </article>
 
-// ====================== 【奖池地址】 ======================
-const PRIZE_POOL_ADDRESS = "0x73390FA5D2D6B37dD9304e0851bb3e6c20Ca44F4";
-// ==========================================================
+      <aside class="center-panel">
+        <div>
+          <div class="tagline" id="selectedGameLabel">Game 1 · 5/26 19:35</div>
+          <div class="versus">VS</div>
+        </div>
+        <div class="countdown">
+          <div class="timebox"><b id="days">0</b><span>天</span></div>
+          <div class="timebox"><b id="hours">0</b><span>时</span></div>
+          <div class="timebox"><b id="minutes">0</b><span>分</span></div>
+          <div class="timebox"><b id="seconds">0</b><span>秒</span></div>
+        </div>
+        <div>
+          <div class="tagline">当前奖池</div>
+          <div class="pool-value" id="poolValue">-- CBA</div>
+        </div>
+        <button class="ghost-btn" id="refreshBtn">刷新数据</button>
+      </aside>
 
-const ADMIN_WALLETS = [
-    "0x73390FA5D2D6B37dD9304e0851bb3e6c20Ca44F4",
-    "0x376097BD8EC49b7ed2165A5dDd6AC8F3F8b9f44E"
-];
+      <article class="team-card blue">
+        <svg class="team-logo zhejiang-logo" viewBox="0 0 250 190" role="img" aria-label="浙江 Lions logo">
+          <path d="M22 151L53 60L124 21l73 21l31 57l-24 71H52z" fill="#0b0b0e" stroke="#f2bb2e" stroke-width="7" stroke-linejoin="round"/>
+          <path d="M58 124l22-54l48-30l53 14l28 44l-18 49H55z" fill="#f2bb2e"/>
+          <path d="M87 75c13-25 43-42 75-28c-24 2-40 10-51 25c18-10 39-11 61-2c-17 5-29 14-37 27c19-9 38-8 58 2c-30 3-56 16-78 39c-15 16-34 12-46-6c20-5 36-15 49-29c-15 2-29 7-41 15c1-17 5-31 10-43z" fill="#0b0b0e"/>
+          <path d="M132 43c18 5 32 16 43 33l16-3l-8 17l20 12l-25 3c-13-23-31-36-55-39z" fill="#0b0b0e"/>
+          <path d="M157 66l13 11l-21 2z" fill="#fff"/>
+          <path d="M52 145h149l-7 20H44z" fill="#0b0b0e"/>
+          <text x="57" y="151" font-size="47" font-weight="1000" fill="#f6c134" stroke="#0b0b0e" stroke-width="5" paint-order="stroke">浙江</text>
+          <text x="70" y="112" font-size="23" font-weight="1000" fill="#f6c134" stroke="#0b0b0e" stroke-width="4" paint-order="stroke">ZJLIONS</text>
+        </svg>
+        <svg class="silhouette" viewBox="0 0 160 220" aria-hidden="true">
+          <path fill="white" d="M63 22a22 22 0 1 0 0 44a22 22 0 0 0 0-44Zm-3 50l-28 31l14 13l14-15l-6 40l-30 51l18 10l29-45l22 49l20-8l-21-56l10-41l19 23l15-13l-30-34c-12-9-29-11-46-5Z"/>
+        </svg>
+        <div class="team-subtitle">2026 CBA FINALS</div>
+        <div class="team-title">浙江浙商证券</div>
+        <div class="tagline">Zhejiang Zheshang Securities · 闪电客场</div>
+        <div class="team-stats">
+          <div class="mini-stat">我的投注<b id="myZhejiangCard">0 注</b></div>
+          <div class="mini-stat">队伍色彩<b style="color:var(--cyan)">BLUE</b></div>
+        </div>
+      </article>
+    </section>
 
-const ERC20_ABI = [
-  {"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},
-  {"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"},
-  {"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"type":"function"}
-];
+    <section class="content-grid">
+      <article class="panel">
+        <h2>竞猜面板</h2>
+        <div class="bet-controls">
+          <div>
+            <label for="ticketInput">注数（1-100，每注 5000 CBA）</label>
+            <input id="ticketInput" type="number" min="1" max="100" value="1" />
+          </div>
+          <div class="cost">
+            总消耗
+            <b id="totalCost">5000 CBA</b>
+          </div>
+        </div>
+        <div class="bet-buttons">
+          <button class="team-bet red" id="betShanghai">🔥 押上海久事胜</button>
+          <button class="team-bet blue" id="betZhejiang">⚡ 押浙江浙商证券胜</button>
+        </div>
+        <div class="claim-row">
+          <div>
+            <b>我的投注</b>
+            <div class="tagline" id="myBetSummary">上海 0 注 · 浙江 0 注</div>
+          </div>
+          <button class="primary-btn" id="claimBtn" disabled>领取奖励</button>
+        </div>
+      </article>
 
-let web3, userAccount = null, userTokenBalance = 0, tokenContract = null;
-const REWARD_MULTIPLIER = 2;
+      <article class="panel">
+        <h2>最近 10 条投注</h2>
+        <div class="records" id="records"></div>
+      </article>
+    </section>
+  </main>
 
-// ====================== 【更新后的7场比赛】 ======================
-let matches = [
-    { id: 1, home: "🇰🇷 韩国", away: "🇨🇿 捷克", date: "2026-06-12 10:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 2, home: "🇧🇷 巴西", away: "🇲🇦 摩洛哥", date: "2026-06-14 06:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 3, home: "🇳🇱 荷兰", away: "🇯🇵 日本", date: "2026-06-15 04:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 4, home: "🇮🇷 伊朗", away: "🇳🇿 新西兰", date: "2026-06-16 09:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 5, home: "🇫🇷 法国", away: "🇸🇳 塞内加尔", date: "2026-06-17 03:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 6, home: "🏴 英格兰", away: "🇭🇷 克罗地亚", date: "2026-06-18 04:00", status: "upcoming", userPick: null, resolved: false, result: null },
-    { id: 7, home: "🇦🇷 阿根廷", away: "🇩🇿 阿尔及利亚", date: "2026-06-23 09:00", status: "upcoming", userPick: null, resolved: false, result: null }
-];
-// =====================================================================
+  <div class="toast" id="toast"></div>
 
-let userPredictions = {};
+  <script>
+    const CBA_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
+    const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+    const TELEGRAM_URL = "https://t.me/CBAquanqiu888";
+    const X_URL = "https://x.com/signalmika86144";
+    const GAME_START_TIMESTAMPS = [
+      1779795300, // 2026-05-26 19:35 Beijing
+      1779968100, // 2026-05-28 19:35 Beijing
+      1780227300, // 2026-05-31 19:35 Beijing
+      1780400100, // 2026-06-02 19:35 Beijing
+      1780659300, // 2026-06-05 19:35 Beijing
+      1780918500, // 2026-06-08 19:35 Beijing
+      1781177700  // 2026-06-11 19:35 Beijing
+    ];
+    const BET_AMOUNT_PER_TICKET = 5000;
+    const BSC_MAINNET = "0x38";
+    const BSC_TESTNET = "0x61";
+    const TEAM_SHANGHAI = 0;
+    const TEAM_ZHEJIANG = 1;
 
-const connectBtn = document.getElementById('connectWalletBtn');
-const walletContainer = document.getElementById('walletContainer');
-const tokenBar = document.getElementById('tokenBar');
-const tokenBalanceSpan = document.getElementById('tokenBalanceDisplay');
-const matchesGrid = document.getElementById('matchesGrid');
-const toastMsgDiv = document.getElementById('toastMsg');
-const adminMatchSelect = document.getElementById("adminMatchSelect");
-const adminResultSelect = document.getElementById("adminResultSelect");
-const adminResolveBtn = document.getElementById("adminResolveBtn");
-const adminPanel = document.getElementById("adminPanel");
+    const ERC20_ABI = [
+      "function balanceOf(address owner) view returns (uint256)",
+      "function allowance(address owner,address spender) view returns (uint256)",
+      "function approve(address spender,uint256 amount) returns (bool)",
+      "function decimals() view returns (uint8)",
+      "function symbol() view returns (string)"
+    ];
 
-function showToast(message, isError = false) {
-    toastMsgDiv.innerText = message;
-    toastMsgDiv.style.display = 'block';
-    toastMsgDiv.style.background = isError ? '#8b2c1ae6' : '#1f2b38e6';
-    toastMsgDiv.style.borderLeftColor = isError ? '#ff6b4a' : '#F5A623';
-    setTimeout(() => toastMsgDiv.style.display = 'none', 3800);
-}
+    const SERIES_ABI = [
+      "function bet(uint8 gameId,uint8 team,uint256 amount) external",
+      "function settle(uint8 gameId,uint8 winner) external",
+      "function claimRewards(uint8 gameId) external",
+      "function getPrizePool(uint8 gameId) external view returns (uint256)",
+      "function getUserBetAmount(address user,uint8 gameId,uint8 team) external view returns (uint256)",
+      "function isGameSettled(uint8 gameId) external view returns (bool)",
+      "function gameWinner(uint8 gameId) external view returns (uint8)",
+      "function hasClaimed(address user,uint8 gameId) external view returns (bool)",
+      "event BetPlaced(address indexed user,uint8 indexed gameId,uint8 indexed team,uint256 amount,uint256 tickets)",
+      "event GameSettled(uint8 indexed gameId,uint8 winner)",
+      "event RewardsClaimed(address indexed user,uint8 indexed gameId,uint256 amount)"
+    ];
 
-async function fetchTokenBalance(account) {
-    if (!account || !tokenContract) return 0;
-    try {
-        const raw = await tokenContract.methods.balanceOf(account).call();
-        const rawNumber = Number(raw.toString());
-        return rawNumber / Math.pow(10, TOKEN_DECIMALS);
-    } catch (e) {
-        console.error("查询余额失败", e);
-        return 0;
-    }
-}
+    const games = [
+      { label: "Game 1", date: "5/26", full: "2026年5月26日 19:35" },
+      { label: "Game 2", date: "5/28", full: "2026年5月28日 19:35" },
+      { label: "Game 3", date: "5/31", full: "2026年5月31日 19:35" },
+      { label: "Game 4", date: "6/2", full: "2026年6月2日 19:35" },
+      { label: "Game 5", date: "6/5", full: "2026年6月5日 19:35（如需）" },
+      { label: "Game 6", date: "6/8", full: "2026年6月8日 19:35（如需）" },
+      { label: "Game 7", date: "6/11", full: "2026年6月11日 19:35（如需）" }
+    ];
 
-async function updateBalanceUI() {
-    if (userAccount) {
-        userTokenBalance = await fetchTokenBalance(userAccount);
-        tokenBalanceSpan.innerText = userTokenBalance.toFixed(4);
-    } else {
-        tokenBalanceSpan.innerText = '0.0000';
-    }
-}
+    let provider, signer, account, token, series, tokenDecimals = 18, tokenSymbol = "CBA";
+    let selectedGame = 0;
+    let settled = Array(7).fill(false);
+    let winners = Array(7).fill(null);
+    let myBets = Array.from({ length: 7 }, () => [ethers.BigNumber.from(0), ethers.BigNumber.from(0)]);
+    let busy = false;
 
-// ====================== 【押注函数 + 自动授权】 ======================
-async function submitPrediction(matchId, pick, amount) {
-    if (!userAccount || !tokenContract) {
-        showToast("⚠️ 请先连接钱包!", true);
-        return false;
-    }
-    const match = matches.find(m => m.id === matchId);
-    if (!match || match.resolved || userPredictions[matchId]?.submitted) {
-        showToast("无法提交预测", true);
-        return false;
-    }
-    if (isNaN(amount) || amount <= 0 || amount > userTokenBalance) {
-        showToast("金额异常或余额不足", true);
-        return false;
-    }
+    const els = {
+      schedule: document.getElementById("schedule"),
+      walletState: document.getElementById("walletState"),
+      connectBtn: document.getElementById("connectBtn"),
+      disconnectBtn: document.getElementById("disconnectBtn"),
+      networkNotice: document.getElementById("networkNotice"),
+      selectedGameLabel: document.getElementById("selectedGameLabel"),
+      days: document.getElementById("days"),
+      hours: document.getElementById("hours"),
+      minutes: document.getElementById("minutes"),
+      seconds: document.getElementById("seconds"),
+      poolValue: document.getElementById("poolValue"),
+      ticketInput: document.getElementById("ticketInput"),
+      totalCost: document.getElementById("totalCost"),
+      betShanghai: document.getElementById("betShanghai"),
+      betZhejiang: document.getElementById("betZhejiang"),
+      claimBtn: document.getElementById("claimBtn"),
+      myBetSummary: document.getElementById("myBetSummary"),
+      myShanghaiCard: document.getElementById("myShanghaiCard"),
+      myZhejiangCard: document.getElementById("myZhejiangCard"),
+      records: document.getElementById("records"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      toast: document.getElementById("toast")
+    };
 
-    const rawAmount = amount * Math.pow(10, TOKEN_DECIMALS);
-    const rawAmountStr = rawAmount.toString();
-
-    showToast(`⏳ 正在向奖池地址质押 ${amount} 代币...`, false);
-    try {
-        await tokenContract.methods.transferFrom(userAccount, PRIZE_POOL_ADDRESS, rawAmountStr).send({ from: userAccount });
-        userPredictions[matchId] = { pick, amount, submitted: true };
-        await updateBalanceUI();
-        renderMatches();
-        showToast(`✅ 预测成功！代币已转入奖池`, false);
-        return true;
-    } catch (e) {
-        console.error(e);
-        if (e.message.includes("transfer amount exceeds allowance")) {
-            showToast("❌ 请先授权代币（连接钱包时已自动授权，如仍报错请刷新页面）", true);
-        } else {
-            showToast("❌ 交易失败", true);
-        }
-        return false;
-    }
-}
-// ==============================================================================
-
-async function resolveMatchAndReward(matchId, winnerResult) {
-    const match = matches.find(m => m.id === matchId);
-    if (!match || match.resolved) return;
-    match.resolved = true;
-    match.result = winnerResult;
-    const userPred = userPredictions[matchId];
-    if (userPred && userPred.submitted) {
-        if (userPred.pick === winnerResult) {
-            showToast(`🎉 预测正确！奖励 ${userPred.amount * REWARD_MULTIPLIER} 代币`, false);
-        } else {
-            showToast(`😢 预测未中`, false);
-        }
-    }
-    renderMatches();
-    loadAdminMatchList();
-}
-
-function loadAdminMatchList() {
-    adminMatchSelect.innerHTML = "";
-    matches.forEach(m => {
-        if (!m.resolved) {
-            let opt = document.createElement("option");
-            opt.value = m.id;
-            opt.innerText = `#${m.id} ${m.home} vs ${m.away}`;
-            adminMatchSelect.appendChild(opt);
-        }
-    });
-}
-
-function renderMatches() {
-    matchesGrid.innerHTML = '';
-    for (let match of matches) {
-        const predRecord = userPredictions[match.id] || { pick: null, amount: 0, submitted: false };
-        const isSubmitted = predRecord.submitted;
-        const selectedPick = predRecord.pick;
-        const isResolved = match.resolved;
-        const card = document.createElement('div');
-        card.className = 'match-card';
-        card.innerHTML = `
-            <div class="match-date">
-                <span><i class="far fa-calendar-alt"></i> ${match.date}</span>
-                <span><i class="fas fa-globe-asia"></i> 小组赛 · 焦点战</span>
-            </div>
-            <div class="teams">
-                <div class="team"><strong>${match.home}</strong></div>
-                <div class="vs">⚡ VS ⚡</div>
-                <div class="team"><strong>${match.away}</strong></div>
-            </div>
-            <div class="prediction-buttons">
-                <button class="pred-btn win ${selectedPick === 'win' && !isSubmitted ? 'active' : ''}" data-pick="win" ${isSubmitted || isResolved ? 'disabled' : ''}><i class="fas fa-flag-checkered"></i> ${match.home} 胜</button>
-                <button class="pred-btn draw ${selectedPick === 'draw' && !isSubmitted ? 'active' : ''}" data-pick="draw" ${isSubmitted || isResolved ? 'disabled' : ''}><i class="fas fa-handshake"></i> 平局</button>
-                <button class="pred-btn lose ${selectedPick === 'lose' && !isSubmitted ? 'active' : ''}" data-pick="lose" ${isSubmitted || isResolved ? 'disabled' : ''}><i class="fas fa-futbol"></i> ${match.away} 胜</button>
-            </div>
-            ${!isResolved ? `
-                <div class="bet-amount-input-container">
-                    <label>押注金额：</label>
-                    <input type="number" id="betAmount-${match.id}" class="bet-amount-input" min="1" placeholder="输入代币数量" ${isSubmitted ? 'disabled' : ''} value="${isSubmitted ? predRecord.amount : ''}">
-                </div>
-                <button class="submit-pred" data-matchid="${match.id}" ${isSubmitted ? 'disabled' : ''}>${isSubmitted ? '✓ 已预测 · 等待开奖' : '🔥 消耗代币预测赢家'}</button>
-                ${isSubmitted ? `<div class="status-msg"><i class="fas fa-check-circle"></i> 已押注 ${predRecord.amount} 枚</div>` : `<div class="status-msg"><i class="fas fa-coins"></i> 猜对赢双倍奖励</div>`}
-            ` : `
-                <div class="status-msg"><i class="fas fa-chart-line"></i> 赛果：${match.result === 'win' ? match.home+'胜' : match.result === 'lose' ? match.away+'胜' : '平局'}</div>
-            `}
+    function renderSchedule() {
+      els.schedule.innerHTML = "";
+      games.forEach((game, index) => {
+        const hasBet = myBets[index] && (myBets[index][0].gt(0) || myBets[index][1].gt(0));
+        const btn = document.createElement("button");
+        btn.className = `game-tab ${index === selectedGame ? "active" : ""}`;
+        btn.innerHTML = `
+          <div class="g"><span>G${index + 1}</span><span>${hasBet ? "🏀" : "○"}</span></div>
+          <div class="date">${game.date} · 19:35</div>
+          ${settled[index] ? `<span class="badge">${teamName(winners[index])} 胜</span>` : ""}
         `;
-        matchesGrid.appendChild(card);
+        btn.onclick = () => selectGame(index);
+        els.schedule.appendChild(btn);
+      });
     }
-    document.querySelectorAll('.submit-pred').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const matchId = parseInt(btn.dataset.matchid);
-            if (userPredictions[matchId]?.submitted) return showToast("不可重复预测", true);
-            const parentCard = btn.closest('.match-card');
-            const activePickBtn = parentCard.querySelector('.pred-btn.active');
-            if (!activePickBtn) return showToast("请先选择胜负平局", true);
-            const amount = Number(parentCard.querySelector(`#betAmount-${matchId}`).value);
-            const pick = activePickBtn.dataset.pick;
-            await submitPrediction(matchId, pick, amount);
-        });
-    });
-    document.querySelectorAll('.pred-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.disabled) return;
-            const parent = btn.closest('.match-card');
-            parent.querySelectorAll('.pred-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        });
-    });
-}
 
-// ====================== 【连接钱包时自动授权】 ======================
-async function connectWallet() {
-    console.log("=== 开始连接钱包 ===");
-    if (!window.ethereum) {
-        showToast("❌ 请安装 MetaMask 或兼容 BSC 的钱包插件", true);
+    async function connectWallet() {
+      if (!window.ethereum) {
+        toast("未检测到 MetaMask 钱包", "err");
         return;
+      }
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = provider.getSigner();
+      account = await signer.getAddress();
+      token = new ethers.Contract(CBA_TOKEN_ADDRESS, ERC20_ABI, signer);
+      series = new ethers.Contract(CONTRACT_ADDRESS, SERIES_ABI, signer);
+      try { tokenDecimals = await token.decimals(); } catch (_) {}
+      try { tokenSymbol = await token.symbol(); } catch (_) {}
+      bindWalletEvents();
+      await refreshAll();
     }
-    try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        userAccount = accounts[0];
-        web3 = new Web3(window.ethereum);
-        tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
-        const chainId = await web3.eth.getChainId();
-        if (chainId !== 56 && chainId !== 97) {
-            showToast("⚠️ 请切换到 BSC 主网（Chain ID: 56）或测试网（97）", true);
-            return;
-        }
-        const shortAddr = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
-        walletContainer.innerHTML = `<div class="wallet-address" style="background:#00000066; border-radius:40px; padding:8px 20px;"><i class="fas fa-link"></i> ${shortAddr}</div>`;
-        tokenBar.style.display = 'flex';
 
-        // 自动授权代币（最大额度，避免每次押注都要授权）
-        showToast("⏳ 正在自动授权代币...", false);
-        const maxAmount = "115792089237316195423570985008687907853269984665640564039457584007908834671663";
-        await tokenContract.methods.approve(userAccount, maxAmount).send({ from: userAccount });
-        showToast("✅ 授权成功！现在可以押注了", false);
-
-        // 多管理员判断
-        if (ADMIN_WALLETS.map(a => a.toLowerCase()).includes(userAccount.toLowerCase())) {
-            adminPanel.style.display = "block";
-            loadAdminMatchList();
-        } else {
-            adminPanel.style.display = "none";
-        }
-
-        await updateBalanceUI();
-        renderMatches();
-        showToast(`✅ 钱包已连接：${shortAddr}`, false);
-    } catch (err) {
-        console.error("❌ 连接钱包失败：", err);
-        showToast(`❌ 连接失败：${err.message}`, true);
+    function bindWalletEvents() {
+      window.ethereum.removeAllListeners?.("accountsChanged");
+      window.ethereum.removeAllListeners?.("chainChanged");
+      window.ethereum.on("accountsChanged", () => window.location.reload());
+      window.ethereum.on("chainChanged", () => window.location.reload());
     }
-}
-// ==============================================================================
 
-adminResolveBtn.addEventListener("click",()=>{
-    const mid = Number(adminMatchSelect.value);
-    const res = adminResultSelect.value;
-    if(!mid||!res) return alert("请选择比赛与赛果");
-    resolveMatchAndReward(mid,res);
-    showToast("✅ 比赛结算完成",false);
-});
+    function disconnectWallet() {
+      provider = signer = account = token = series = null;
+      els.walletState.textContent = "未连接钱包";
+      els.connectBtn.style.display = "";
+      els.disconnectBtn.style.display = "none";
+      renderSchedule();
+      updateButtons();
+    }
 
-connectBtn.addEventListener('click', connectWallet);
-renderMatches();
-if (window.ethereum && window.ethereum.selectedAddress) connectWallet();
-if (window.ethereum) {
-    window.ethereum.on('accountsChanged', accounts => {
-        if(accounts.length){
-            userAccount = accounts[0];
-            tokenContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESS);
-            if (ADMIN_WALLETS.map(a => a.toLowerCase()).includes(userAccount.toLowerCase())) {
-                adminPanel.style.display = "block";
-                loadAdminMatchList();
-            } else {
-                adminPanel.style.display = "none";
-            }
-            updateBalanceUI();renderMatches();showToast("账户已切换",false);
-        }else{
-            userAccount=null;tokenContract=null;tokenBar.style.display='none';adminPanel.style.display='none';
-            renderMatches();
-            walletContainer.innerHTML='<button id="connectWalletBtn" class="wallet-btn"><i class="fas fa-wallet"></i> 连接钱包 (BSC)</button>';
-            document.getElementById('connectWalletBtn').addEventListener('click',connectWallet);
+    async function checkNetwork() {
+      if (!window.ethereum) return false;
+      const chainId = await window.ethereum.request({ method: "eth_chainId" });
+      const ok = chainId === BSC_MAINNET || chainId === BSC_TESTNET;
+      els.networkNotice.style.display = ok ? "none" : "block";
+      els.networkNotice.textContent = ok ? "" : "当前钱包不在 BSC 主网或测试网，请切换到 BSC 网络。";
+      return ok;
+    }
+
+    async function switchToBsc() {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: BSC_MAINNET }]
+      });
+    }
+
+    async function refreshAll() {
+      await checkNetwork();
+      await refreshWallet();
+      await fetchGameState(selectedGame);
+      await fetchRecentBets(selectedGame);
+      renderSchedule();
+      updateButtons();
+    }
+
+    async function refreshWallet() {
+      if (!account || !token) {
+        els.walletState.textContent = "未连接钱包";
+        return;
+      }
+      const balance = await token.balanceOf(account);
+      els.walletState.textContent = `${short(account)} · ${fmtToken(balance)} ${tokenSymbol}`;
+      els.connectBtn.style.display = "none";
+      els.disconnectBtn.style.display = "";
+    }
+
+    async function fetchPrizePool(gameId) {
+      if (!series) return ethers.BigNumber.from(0);
+      return await series.getPrizePool(gameId);
+    }
+
+    async function fetchUserBet(gameId) {
+      if (!series || !account) return [ethers.BigNumber.from(0), ethers.BigNumber.from(0)];
+      const [s, z] = await Promise.all([
+        series.getUserBetAmount(account, gameId, TEAM_SHANGHAI),
+        series.getUserBetAmount(account, gameId, TEAM_ZHEJIANG)
+      ]);
+      myBets[gameId] = [s, z];
+      return [s, z];
+    }
+
+    async function fetchSettlement(gameId) {
+      if (!series) return;
+      try {
+        settled[gameId] = await series.isGameSettled(gameId);
+      } catch (_) {
+        settled[gameId] = false;
+      }
+      if (settled[gameId]) {
+        try { winners[gameId] = Number(await series.gameWinner(gameId)); } catch (_) {}
+      }
+    }
+
+    async function fetchGameState(gameId) {
+      els.selectedGameLabel.textContent = `${games[gameId].label} · ${games[gameId].full}`;
+      if (!series) {
+        els.poolValue.textContent = "-- CBA";
+        updateMyBets([ethers.BigNumber.from(0), ethers.BigNumber.from(0)]);
+        return;
+      }
+      try {
+        const [pool, bets] = await Promise.all([fetchPrizePool(gameId), fetchUserBet(gameId), fetchSettlement(gameId)]);
+        els.poolValue.textContent = `${fmtToken(pool)} ${tokenSymbol}`;
+        updateMyBets(bets);
+      } catch (error) {
+        toast(`刷新失败：${error.message || error}`, "err");
+      }
+    }
+
+    function updateMyBets(bets) {
+      const sTickets = ticketsFromAmount(bets[0]);
+      const zTickets = ticketsFromAmount(bets[1]);
+      els.myBetSummary.textContent = `上海 ${sTickets} 注（${fmtToken(bets[0])} ${tokenSymbol}） · 浙江 ${zTickets} 注（${fmtToken(bets[1])} ${tokenSymbol}）`;
+      els.myShanghaiCard.textContent = `${sTickets} 注`;
+      els.myZhejiangCard.textContent = `${zTickets} 注`;
+    }
+
+    async function getCBAAllowance() {
+      if (!token || !account) return ethers.BigNumber.from(0);
+      return await token.allowance(account, CONTRACT_ADDRESS);
+    }
+
+    async function approveCBA(amount) {
+      const tx = await token.approve(CONTRACT_ADDRESS, amount);
+      toast("等待授权确认...");
+      await tx.wait();
+      toast("授权成功", "ok");
+    }
+
+    async function placeBet(gameId, team, tickets) {
+      if (busy) return;
+      if (!account) {
+        toast("请先连接钱包", "err");
+        return;
+      }
+      const networkOk = await checkNetwork();
+      if (!networkOk) {
+        try { await switchToBsc(); } catch (error) { toast("请切换到 BSC 网络", "err"); return; }
+      }
+      if (Date.now() / 1000 >= GAME_START_TIMESTAMPS[gameId]) {
+        toast("比赛已开始，无法下注", "err");
+        return;
+      }
+      if (settled[gameId]) {
+        toast("该场已结算", "err");
+        return;
+      }
+
+      busy = true;
+      updateButtons();
+      try {
+        const amount = amountFromTickets(tickets);
+        const balance = await token.balanceOf(account);
+        if (balance.lt(amount)) throw new Error("CBA 余额不足");
+        const allowance = await getCBAAllowance();
+        if (allowance.lt(amount)) await approveCBA(amount);
+        toast("请在钱包确认下注交易...");
+        const tx = await series.bet(gameId, team, amount);
+        await tx.wait();
+        toast("🏀 投注成功", "ok");
+        burst();
+        await refreshAll();
+      } catch (error) {
+        toast(`投注失败：${error.data?.message || error.message || error}`, "err");
+      } finally {
+        busy = false;
+        updateButtons();
+      }
+    }
+
+    async function claimRewards(gameId) {
+      if (!series || busy) return;
+      busy = true;
+      updateButtons();
+      try {
+        toast("请在钱包确认领取交易...");
+        const tx = await series.claimRewards(gameId);
+        await tx.wait();
+        toast("奖励已领取", "ok");
+        burst();
+        await refreshAll();
+      } catch (error) {
+        toast(`领取失败：${error.data?.message || error.message || error}`, "err");
+      } finally {
+        busy = false;
+        updateButtons();
+      }
+    }
+
+    async function fetchRecentBets(gameId) {
+      els.records.innerHTML = `<div class="record"><span>等待链上记录</span><strong>--</strong></div>`;
+      if (!series || !provider) return;
+      try {
+        const filter = series.filters.BetPlaced(null, gameId);
+        const latest = await provider.getBlockNumber();
+        const events = await series.queryFilter(filter, Math.max(0, latest - 50000), latest);
+        const rows = events.slice(-10).reverse();
+        els.records.innerHTML = rows.length ? "" : `<div class="record"><span>暂无投注</span><strong>--</strong></div>`;
+        for (const ev of rows) {
+          const user = ev.args.user;
+          const team = Number(ev.args.team);
+          const amount = ev.args.amount;
+          const block = await provider.getBlock(ev.blockNumber);
+          const div = document.createElement("div");
+          div.className = "record";
+          div.innerHTML = `<span><strong>${short(user)}</strong> 押${teamName(team)} ${ticketsFromAmount(amount)}注</span><strong>${relativeTime(block.timestamp)}</strong>`;
+          els.records.appendChild(div);
         }
-    });
-    window.ethereum.on('chainChanged',()=>location.reload());
-}
-</script>
+      } catch (_) {
+        els.records.innerHTML = `<div class="record"><span>合约未提供 BetPlaced 事件或 RPC 限制</span><strong>--</strong></div>`;
+      }
+    }
+
+    function updateCountdown() {
+      const diff = Math.max(0, GAME_START_TIMESTAMPS[selectedGame] - Math.floor(Date.now() / 1000));
+      const d = Math.floor(diff / 86400);
+      const h = Math.floor((diff % 86400) / 3600);
+      const m = Math.floor((diff % 3600) / 60);
+      const s = diff % 60;
+      els.days.textContent = d;
+      els.hours.textContent = h;
+      els.minutes.textContent = m;
+      els.seconds.textContent = s;
+      updateButtons();
+    }
+
+    function updateButtons() {
+      const gameStarted = Date.now() / 1000 >= GAME_START_TIMESTAMPS[selectedGame];
+      const invalidContract = CBA_TOKEN_ADDRESS === ethers.constants.AddressZero || CONTRACT_ADDRESS === ethers.constants.AddressZero;
+      const disabled = busy || !account || gameStarted || settled[selectedGame] || invalidContract;
+      els.betShanghai.disabled = disabled;
+      els.betZhejiang.disabled = disabled;
+      els.claimBtn.disabled = busy || !account || !settled[selectedGame];
+      if (invalidContract) {
+        els.networkNotice.style.display = "block";
+        els.networkNotice.textContent = "请先在 HTML 顶部配置 CBA_TOKEN_ADDRESS 和 CONTRACT_ADDRESS。";
+      }
+    }
+
+    function selectGame(index) {
+      selectedGame = index;
+      renderSchedule();
+      fetchGameState(index);
+      fetchRecentBets(index);
+      updateCountdown();
+    }
+
+    function amountFromTickets(tickets) {
+      return ethers.utils.parseUnits(String(tickets * BET_AMOUNT_PER_TICKET), tokenDecimals);
+    }
+
+    function ticketsFromAmount(amount) {
+      if (!amount || amount.isZero()) return 0;
+      return Math.floor(Number(ethers.utils.formatUnits(amount, tokenDecimals)) / BET_AMOUNT_PER_TICKET);
+    }
+
+    function fmtToken(value) {
+      const n = Number(ethers.utils.formatUnits(value || 0, tokenDecimals));
+      return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+    }
+
+    function short(address) {
+      return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "--";
+    }
+
+    function teamName(team) {
+      return Number(team) === TEAM_SHANGHAI ? "上海" : "浙江";
+    }
+
+    function relativeTime(timestamp) {
+      const diff = Math.max(0, Math.floor(Date.now() / 1000) - Number(timestamp));
+      if (diff < 60) return `${diff}s`;
+      if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+      return `${Math.floor(diff / 3600)}h`;
+    }
+
+    function toast(message, type = "") {
+      els.toast.textContent = message;
+      els.toast.className = `toast show ${type}`;
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => els.toast.className = "toast", 3200);
+    }
+
+    function burst() {
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement("div");
+        p.className = "particle";
+        p.textContent = "🏀";
+        p.style.left = `${20 + Math.random() * 60}vw`;
+        p.style.top = `${70 + Math.random() * 20}vh`;
+        p.style.animationDelay = `${Math.random() * .18}s`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1600);
+      }
+    }
+
+    function syncTicketCost() {
+      let tickets = Number(els.ticketInput.value || 1);
+      tickets = Math.max(1, Math.min(100, Math.floor(tickets)));
+      els.ticketInput.value = tickets;
+      els.totalCost.textContent = `${(tickets * BET_AMOUNT_PER_TICKET).toLocaleString("en-US")} ${tokenSymbol}`;
+    }
+
+    els.connectBtn.onclick = connectWallet;
+    els.disconnectBtn.onclick = disconnectWallet;
+    els.refreshBtn.onclick = refreshAll;
+    els.ticketInput.oninput = syncTicketCost;
+    els.betShanghai.onclick = () => placeBet(selectedGame, TEAM_SHANGHAI, Number(els.ticketInput.value || 1));
+    els.betZhejiang.onclick = () => placeBet(selectedGame, TEAM_ZHEJIANG, Number(els.ticketInput.value || 1));
+    els.claimBtn.onclick = () => claimRewards(selectedGame);
+    document.getElementById("telegramLink").href = TELEGRAM_URL;
+    document.getElementById("xLink").href = X_URL;
+
+    renderSchedule();
+    syncTicketCost();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
 </body>
 </html>
