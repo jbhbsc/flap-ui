@@ -107,6 +107,16 @@
       justify-content: flex-end;
     }
 
+    .contract-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 288px;
+      text-align: center;
+    }
+
     .wallet-state {
       color: var(--muted);
       border: 1px solid var(--line);
@@ -118,6 +128,35 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .buy-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #ffe7a3;
+      border: 1px solid rgba(255, 200, 87, .26);
+      background: rgba(255, 200, 87, .08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .buy-link:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 34px rgba(0,0,0,.28);
+    }
+
+    .contract-text {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      word-break: break-all;
+      user-select: text;
     }
 
     .social-links {
@@ -641,6 +680,10 @@
           <div class="tagline">燃烧 CBA 代币，竞猜总冠军</div>
         </div>
       </div>
+      <div class="contract-block">
+        <a class="buy-link" id="buyLink" href="#" target="_blank" rel="noopener">购买链接</a>
+        <div class="contract-text" id="tokenAddressText"></div>
+      </div>
       <div class="wallet-box">
         <div class="social-links">
           <a class="social-link telegram" id="telegramLink" href="#" target="_blank" rel="noopener" aria-label="Telegram">
@@ -766,8 +809,8 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const CBA_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
-    const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+    const CBA_TOKEN_ADDRESS = "0x77734e70b6e88b4d82fe632a168edf6e700912b6";
+    const CONTRACT_ADDRESS = "";
     const TELEGRAM_URL = "https://t.me/CBAquanqiu888";
     const X_URL = "https://x.com/signalmika86144";
     const GAME_START_TIMESTAMPS = [
@@ -830,6 +873,8 @@
       connectBtn: document.getElementById("connectBtn"),
       disconnectBtn: document.getElementById("disconnectBtn"),
       networkNotice: document.getElementById("networkNotice"),
+      buyLink: document.getElementById("buyLink"),
+      tokenAddressText: document.getElementById("tokenAddressText"),
       selectedGameLabel: document.getElementById("selectedGameLabel"),
       days: document.getElementById("days"),
       hours: document.getElementById("hours"),
@@ -848,6 +893,18 @@
       refreshBtn: document.getElementById("refreshBtn"),
       toast: document.getElementById("toast")
     };
+
+    function isConfiguredAddress(address) {
+      return Boolean(address) && ethers.utils.isAddress(address) && address !== ethers.constants.AddressZero;
+    }
+
+    function isTokenConfigured() {
+      return isConfiguredAddress(CBA_TOKEN_ADDRESS);
+    }
+
+    function isSeriesConfigured() {
+      return isConfiguredAddress(CONTRACT_ADDRESS);
+    }
 
     function renderSchedule() {
       els.schedule.innerHTML = "";
@@ -874,10 +931,12 @@
       await provider.send("eth_requestAccounts", []);
       signer = provider.getSigner();
       account = await signer.getAddress();
-      token = new ethers.Contract(CBA_TOKEN_ADDRESS, ERC20_ABI, signer);
-      series = new ethers.Contract(CONTRACT_ADDRESS, SERIES_ABI, signer);
-      try { tokenDecimals = await token.decimals(); } catch (_) {}
-      try { tokenSymbol = await token.symbol(); } catch (_) {}
+      token = isTokenConfigured() ? new ethers.Contract(CBA_TOKEN_ADDRESS, ERC20_ABI, signer) : null;
+      series = isSeriesConfigured() ? new ethers.Contract(CONTRACT_ADDRESS, SERIES_ABI, signer) : null;
+      if (token) {
+        try { tokenDecimals = await token.decimals(); } catch (_) {}
+        try { tokenSymbol = await token.symbol(); } catch (_) {}
+      }
       bindWalletEvents();
       await refreshAll();
     }
@@ -924,14 +983,23 @@
     }
 
     async function refreshWallet() {
-      if (!account || !token) {
+      if (!account) {
         els.walletState.textContent = "未连接钱包";
         return;
       }
-      const balance = await token.balanceOf(account);
-      els.walletState.textContent = `${short(account)} · ${fmtToken(balance)} ${tokenSymbol}`;
       els.connectBtn.style.display = "none";
       els.disconnectBtn.style.display = "";
+      if (!token) {
+        els.walletState.textContent = `${short(account)} · CBA 地址未配置`;
+        return;
+      }
+      try {
+        const balance = await token.balanceOf(account);
+        els.walletState.textContent = `${short(account)} · ${fmtToken(balance)} ${tokenSymbol}`;
+      } catch (error) {
+        els.walletState.textContent = `${short(account)} · CBA 余额读取失败`;
+        toast("CBA 代币地址无效或当前网络不匹配", "err");
+      }
     }
 
     async function fetchPrizePool(gameId) {
@@ -1003,6 +1071,14 @@
         toast("请先连接钱包", "err");
         return;
       }
+      if (!series) {
+        toast("竞猜合约暂未配置，当前只开放页面预览和钱包连接", "err");
+        return;
+      }
+      if (!token) {
+        toast("请先配置 CBA 代币地址", "err");
+        return;
+      }
       const networkOk = await checkNetwork();
       if (!networkOk) {
         try { await switchToBsc(); } catch (error) { toast("请切换到 BSC 网络", "err"); return; }
@@ -1039,7 +1115,10 @@
     }
 
     async function claimRewards(gameId) {
-      if (!series || busy) return;
+      if (!series || busy) {
+        if (!series) toast("竞猜合约暂未配置，暂不能领取奖励", "err");
+        return;
+      }
       busy = true;
       updateButtons();
       try {
@@ -1096,14 +1175,18 @@
 
     function updateButtons() {
       const gameStarted = Date.now() / 1000 >= GAME_START_TIMESTAMPS[selectedGame];
-      const invalidContract = CBA_TOKEN_ADDRESS === ethers.constants.AddressZero || CONTRACT_ADDRESS === ethers.constants.AddressZero;
-      const disabled = busy || !account || gameStarted || settled[selectedGame] || invalidContract;
+      const tokenMissing = !isTokenConfigured();
+      const seriesMissing = !isSeriesConfigured();
+      const disabled = busy || !account || gameStarted || settled[selectedGame] || tokenMissing || seriesMissing;
       els.betShanghai.disabled = disabled;
       els.betZhejiang.disabled = disabled;
-      els.claimBtn.disabled = busy || !account || !settled[selectedGame];
-      if (invalidContract) {
+      els.claimBtn.disabled = busy || !account || !settled[selectedGame] || seriesMissing;
+      if (tokenMissing) {
         els.networkNotice.style.display = "block";
-        els.networkNotice.textContent = "请先在 HTML 顶部配置 CBA_TOKEN_ADDRESS 和 CONTRACT_ADDRESS。";
+        els.networkNotice.textContent = "请先在 HTML 顶部配置 CBA_TOKEN_ADDRESS。";
+      } else if (seriesMissing) {
+        els.networkNotice.style.display = "block";
+        els.networkNotice.textContent = "竞猜功能暂未开启，当前可连接钱包并查看 CBA 余额。";
       }
     }
 
@@ -1131,6 +1214,19 @@
 
     function short(address) {
       return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "--";
+    }
+
+    function renderTokenAddress() {
+      if (!isTokenConfigured()) {
+        els.buyLink.textContent = "购买链接";
+        els.buyLink.removeAttribute("href");
+        els.tokenAddressText.textContent = "合约地址：未配置";
+        return;
+      }
+      els.buyLink.textContent = "购买链接";
+      els.buyLink.href = `https://gmgn.ai/bsc/token/${CBA_TOKEN_ADDRESS}?chain=bsc&ref=QHTtwjJV`;
+      els.buyLink.title = "在 GMGN 打开购买页面";
+      els.tokenAddressText.textContent = `合约地址：${CBA_TOKEN_ADDRESS}`;
     }
 
     function teamName(team) {
@@ -1182,6 +1278,7 @@
     document.getElementById("xLink").href = X_URL;
 
     renderSchedule();
+    renderTokenAddress();
     syncTicketCost();
     updateCountdown();
     setInterval(updateCountdown, 1000);
