@@ -677,7 +677,7 @@
         <div class="brand-mark">🏀</div>
         <div>
           <h1>CBA Finals Predictor</h1>
-          <div class="tagline">燃烧 CBA 代币，竞猜总冠军</div>
+          <div class="tagline">燃烧中国篮球代币，竞猜总冠军</div>
         </div>
       </div>
       <div class="contract-block">
@@ -744,7 +744,7 @@
         </div>
         <div>
           <div class="tagline">当前奖池</div>
-          <div class="pool-value" id="poolValue">-- CBA</div>
+          <div class="pool-value" id="poolValue">-- 中国篮球</div>
         </div>
         <button class="ghost-btn" id="refreshBtn">刷新数据</button>
       </aside>
@@ -778,12 +778,12 @@
         <h2>竞猜面板</h2>
         <div class="bet-controls">
           <div>
-            <label for="ticketInput">注数（1-100，每注 5000 CBA）</label>
+            <label for="ticketInput">注数（1-100，每注 5000 中国篮球）</label>
             <input id="ticketInput" type="number" min="1" max="100" value="1" />
           </div>
           <div class="cost">
             总消耗
-            <b id="totalCost">5000 CBA</b>
+            <b id="totalCost">5000 中国篮球</b>
           </div>
         </div>
         <div class="bet-buttons">
@@ -809,10 +809,11 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const CBA_TOKEN_ADDRESS = "";
+    const CBA_TOKEN_ADDRESS = "0x77734e70b6e88b4d82fe632a168edf6e700912b6";
     const CONTRACT_ADDRESS = "";
     const TELEGRAM_URL = "https://t.me/CBAquanqiu888";
     const X_URL = "https://x.com/signalmika86144";
+    const TOKEN_DISPLAY_NAME = "中国篮球";
     const GAME_START_TIMESTAMPS = [
       1779795300, // 2026-05-26 19:35 Beijing
       1779968100, // 2026-05-28 19:35 Beijing
@@ -860,7 +861,7 @@
       { label: "Game 7", date: "6/11", full: "2026年6月11日 19:35（如需）" }
     ];
 
-    let provider, signer, account, token, series, tokenDecimals = 18, tokenSymbol = "CBA";
+    let provider, signer, account, token, series, tokenDecimals = 18, tokenSymbol = TOKEN_DISPLAY_NAME;
     let selectedGame = 0;
     let settled = Array(7).fill(false);
     let winners = Array(7).fill(null);
@@ -935,7 +936,7 @@
       series = isSeriesConfigured() ? new ethers.Contract(CONTRACT_ADDRESS, SERIES_ABI, signer) : null;
       if (token) {
         try { tokenDecimals = await token.decimals(); } catch (_) {}
-        try { tokenSymbol = await token.symbol(); } catch (_) {}
+        tokenSymbol = TOKEN_DISPLAY_NAME;
       }
       bindWalletEvents();
       await refreshAll();
@@ -990,15 +991,15 @@
       els.connectBtn.style.display = "none";
       els.disconnectBtn.style.display = "";
       if (!token) {
-        els.walletState.textContent = `${short(account)} · CBA 地址未配置`;
+        els.walletState.textContent = `${short(account)} · 中国篮球地址未配置`;
         return;
       }
       try {
         const balance = await token.balanceOf(account);
         els.walletState.textContent = `${short(account)} · ${fmtToken(balance)} ${tokenSymbol}`;
       } catch (error) {
-        els.walletState.textContent = `${short(account)} · CBA 余额读取失败`;
-        toast("CBA 代币地址无效或当前网络不匹配", "err");
+        els.walletState.textContent = `${short(account)} · 中国篮球余额读取失败`;
+        toast("中国篮球代币地址无效或当前网络不匹配", "err");
       }
     }
 
@@ -1032,7 +1033,7 @@
     async function fetchGameState(gameId) {
       els.selectedGameLabel.textContent = `${games[gameId].label} · ${games[gameId].full}`;
       if (!series) {
-        els.poolValue.textContent = "-- CBA";
+        els.poolValue.textContent = "-- 中国篮球";
         updateMyBets([ethers.BigNumber.from(0), ethers.BigNumber.from(0)]);
         return;
       }
@@ -1076,7 +1077,7 @@
         return;
       }
       if (!token) {
-        toast("请先配置 CBA 代币地址", "err");
+        toast("请先配置中国篮球代币地址", "err");
         return;
       }
       const networkOk = await checkNetwork();
@@ -1097,7 +1098,7 @@
       try {
         const amount = amountFromTickets(tickets);
         const balance = await token.balanceOf(account);
-        if (balance.lt(amount)) throw new Error("CBA 余额不足");
+        if (balance.lt(amount)) throw new Error("中国篮球余额不足");
         const allowance = await getCBAAllowance();
         if (allowance.lt(amount)) await approveCBA(amount);
         toast("请在钱包确认下注交易...");
@@ -1183,10 +1184,10 @@
       els.claimBtn.disabled = busy || !account || !settled[selectedGame] || seriesMissing;
       if (tokenMissing) {
         els.networkNotice.style.display = "block";
-        els.networkNotice.textContent = "请先在 HTML 顶部配置 CBA_TOKEN_ADDRESS。";
+        els.networkNotice.textContent = "请先在 HTML 顶部配置中国篮球代币地址。";
       } else if (seriesMissing) {
         els.networkNotice.style.display = "block";
-        els.networkNotice.textContent = "竞猜功能暂未开启，当前可连接钱包并查看 CBA 余额。";
+        els.networkNotice.textContent = "竞猜功能暂未开启，当前可连接钱包并查看中国篮球余额。";
       }
     }
 
